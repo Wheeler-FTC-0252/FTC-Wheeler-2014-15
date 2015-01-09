@@ -69,9 +69,9 @@ task main()
 	int spinnerSpeedIn=0;
 
 	if (luccomputer){
-		doorbutton=1;
-		spinnerIn=2;
-		spinnerOut=4;
+		doorbutton=4;
+		spinnerIn=1;
+		spinnerOut=2;
 	}
 
 	int roundup;
@@ -143,31 +143,31 @@ task main()
 
 		//SERVO DOOR//
 		if (buttons_joy2!=button_old){
-			if (buttons_joy2==1 && dooropen==false){//open door
+			if (buttons_joy2==doorbutton && dooropen==false){//open door
 				dooropen=true;
 				servo[door]=dooropenpos;
 			}
-			else if (buttons_joy2==1 && dooropen==true){
+			else if (buttons_joy2==doorbutton && dooropen==true){
 				dooropen=false;
 				servo[door]=doorclosedpos;
 			}
-			else if (buttons_joy2==2 && spinneron==false){//open door
-				spinneron=true;
+			else if (buttons_joy2==spinnerIn && spinneron==false){
+				spinneron=true;//forward
 				servo[spin1]=spinnerSpeedIn;
 				servo[spin2]=spinnerSpeedOut;
 			}
-			else if (buttons_joy2==2 && spinneron==true){
-				spinneron=false;
+			else if (buttons_joy2==spinnerIn && spinneron==true){
+				spinneron=false;//stop
 				servo[spin1]=127;
 				servo[spin2]=127;
 			}
-			else if (buttons_joy2==4 && spinneron== false){
-				spinneron=true;
+			else if (buttons_joy2==spinnerOut && spinneron== false){
+				spinneron=true;//back
 				servo[spin1]=spinnerSpeedOut;
 				servo[spin2]=spinnerSpeedIn;
 			}
-			else if (buttons_joy2==4 && spinneron== true){
-				spinneron=false;
+			else if (buttons_joy2==spinnerOut && spinneron== true){
+				spinneron=false;//stop
 				servo[spin1]=127;
 				servo[spin2]=127;
 			}
