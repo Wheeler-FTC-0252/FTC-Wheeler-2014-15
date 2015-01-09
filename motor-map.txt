@@ -1,0 +1,12 @@
+Motor Map
+
+Sensor Port 1:
+	1. Motor Controller
+		1. nothing
+		2. arm
+	2. Motor Controller - (left)
+		1. front two
+		2. back one
+	3. Motor Controller - (right)
+		1. front two
+		2. back one
