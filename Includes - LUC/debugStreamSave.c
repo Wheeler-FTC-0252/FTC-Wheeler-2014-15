@@ -1,22 +1,27 @@
-void writeDebugStreamSaveMain(string saveText, bool carrageReturn){
+void writeDebugStreamSaveMain(char saveText, bool carrageReturn){
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
 	const char * debugSaveFile="debugSave.txt";
 	short stringLength=sizeof(saveText);
 
-	writeDebugStreamLine(saveText);
+
 	OpenWrite(FileHandle, IoResult, debugSaveFile, stringLength);
 
 	if (carrageReturn){//newline
 		WriteString(FileHandle, IoResult, "\n");
+		writeDebugStreamLine(saveText);
+	}
+	else{
+		writeDebugStream(saveText);
 	}
 	WriteString(FileHandle, IoResult, saveText);
+	Close(FileHandle, IoResult);
 }
 
-void writeDebugStreamLineSave(string saveText){
+void writeDebugStreamLineSave(char saveText){
 	writeDebugStreamSaveMain(saveText, true);
 }
 
-void writeDebugStreamLineSave(string saveText){
+void writeDebugStreamSave(char saveText){
 	writeDebugStreamSaveMain(saveText, false);
 }
