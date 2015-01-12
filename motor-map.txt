@@ -10,3 +10,8 @@ Sensor Port 1:
 	3. Motor Controller - (right)
 		1. front two
 		2. back one
+	4. Servo Controller
+		1. door - 180
+		2. spin 1 - CR
+		3. spin 2 - CR
+		4. catch - 180
