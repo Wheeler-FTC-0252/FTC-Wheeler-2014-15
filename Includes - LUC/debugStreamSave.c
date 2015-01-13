@@ -1,4 +1,4 @@
-void writeDebugStreamSaveMain(char saveText, bool carrageReturn){
+void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
 	const char * debugSaveFile="debugSave.txt";
@@ -18,10 +18,10 @@ void writeDebugStreamSaveMain(char saveText, bool carrageReturn){
 	Close(FileHandle, IoResult);
 }
 
-void writeDebugStreamLineSave(char saveText){
+void writeDebugStreamLineSave(const char * saveText){
 	writeDebugStreamSaveMain(saveText, true);
 }
 
-void writeDebugStreamSave(char saveText){
+void writeDebugStreamSave(const char * saveText){
 	writeDebugStreamSaveMain(saveText, false);
 }
