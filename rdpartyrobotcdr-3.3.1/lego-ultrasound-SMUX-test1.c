@@ -15,15 +15,15 @@
  *
  * License: You may use this code as you wish, provided you give credit where it's due.
  *
- * THIS CODE WILL ONLY WORK WITH ROBOTC VERSION 3.59 AND HIGHER. 
+ * THIS CODE WILL ONLY WORK WITH ROBOTC VERSION 3.59 AND HIGHER.
 
  * Xander Soldaat (xander_at_botbench.com)
  * 25 November 2009
  * version 0.2
  */
 
-#include "drivers/hitechnic-sensormux.h"
-#include "drivers/lego-ultrasound.h"
+#include "hitechnic-sensormux.h"
+#include "lego-ultrasound.h"
 
 // The sensor is connected to the first port
 // of the SMUX which is connected to the NXT port S1.
