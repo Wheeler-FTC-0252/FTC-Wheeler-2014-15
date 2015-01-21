@@ -49,5 +49,5 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis,tSensors fSona
 	motorSide(left, 0);
 	motorSide(right, 0);
 
-	playSound(soundBeepBeep); while (bSoundActive){}
+	if (sounds){ playSound(soundBeepBeep); while (bSoundActive){}; }
 }

@@ -2,9 +2,8 @@
 
 // Now has no motor limit -- 150120
 
-void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis, tSensors compass, tSensors bSonar, tSensors rSonar, tMotor *left, tMotor *right,bool sounds=false){
+void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis, tSensors compass, tSensors bSonar, tSensors rSonar, tMotor *left, tMotor *right,bool sounds=false, bool debug=false){
 	int delta;
-	bool debug=true;
 
 	clearTimer(T1);
 	while(true)
@@ -50,8 +49,5 @@ void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorE
 	motorSide(left, 0);
 	motorSide(right, 0);
 
-	if (debug){
-		playSound(soundBeepBeep);
-		while (bSoundActive){}
-	}
+	if (sounds){ playSound(soundBeepBeep); while (bSoundActive){}; }
 }
