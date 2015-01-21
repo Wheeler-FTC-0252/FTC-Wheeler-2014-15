@@ -1,4 +1,8 @@
-void compassfollow(int speed,int rotateSpeed,int rotateTarget,int timeSensorEnable,bool sonarStop, int stopDis,tSensors compass,tSensors bSonar,tSensors rSonar, tMotor left, tMotor right){
+#include "motorSide.c"
+
+// Now has no motor limit -- 150120
+
+void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis, tSensors compass, tSensors bSonar, tSensors rSonar, tMotor *left, tMotor *right,bool sounds=false){
 	int delta;
 	bool debug=true;
 
@@ -27,15 +31,15 @@ void compassfollow(int speed,int rotateSpeed,int rotateTarget,int timeSensorEnab
 		}
 
 		if (rotateSpeed!=0){//rotate
-			motor[left]=abs(rotateSpeed)*(-delta);
-			motor[right]=abs(rotateSpeed)*(delta);
+			motorSide(left, (abs(rotateSpeed)*(-delta)));
+			motorSide(right, (abs(rotateSpeed)*(delta)));
 			if(abs(delta)<0.05) break;
 		}
 		else{//drive and keep bearing
-			motor[left]=speed*(1+delta);
-			motor[right]=speed*(1-delta);
+			motorSide(left, (speed*(1+delta)));
+			motorSide(right, (speed*(1-delta)));
 
-			if (stopdis>-1 || time10[T1]>timeSensorEnable){
+			if (stopDis>-1 || time10[T1]>timeSensorEnable){
 				if (bSonar<stopDis || rSonar<stopDis){
 					break;
 				}
@@ -43,8 +47,8 @@ void compassfollow(int speed,int rotateSpeed,int rotateTarget,int timeSensorEnab
 		}
 	}
 
-	motor[left]=0;
-	motor[right]=0;
+	motorSide(left, 0);
+	motorSide(right, 0);
 
 	if (debug){
 		playSound(soundBeepBeep);
