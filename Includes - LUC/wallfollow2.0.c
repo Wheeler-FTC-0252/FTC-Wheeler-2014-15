@@ -1,4 +1,5 @@
 #include "motorSide.c"
+#include "motorSideMUX.c"
 #include "hitechnic-sensormux.h"
 #include "lego-ultrasound.h"
 #include "mindsensors-motormux.h"
@@ -9,6 +10,15 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 	int delta;
 	int sonarF;
 	int sonarR;
+
+	if (*leftMUX>15){
+		motorSideMUX(leftMUX,speed);
+	}
+
+	if (*rightMUX>15){
+		motorSideMUX(rightMUX,speed);
+	}
+
 	motorSide(left, speed);
 	motorSide(right, speed);
 

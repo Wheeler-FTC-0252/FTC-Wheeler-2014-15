@@ -1,4 +1,5 @@
 #include "motorSide.c"
+#include "motorSideMUX.c"
 #include "hitechnic-sensormux.h"
 #include "lego-ultrasound.h"
 #include "mindsensors-motormux.h"
