@@ -1,6 +1,4 @@
-#pragma config(Sensor, S1,     bSonar,         sensorSONAR)
-#pragma config(Sensor, S2,     fSonar,         sensorSONAR)
-#pragma config(Sensor, S3,     rSonar,         sensorSONAR)
+#pragma config(Sensor, S1,     SMUX,           sensorI2CCustomFastSkipStates)
 #pragma config(Sensor, S4,     compass,        sensorI2CHiTechnicCompass)
 #pragma config(Motor,  motorA,          left,          tmotorNXT, PIDControl, driveLeft, encoder)
 #pragma config(Motor,  motorB,          right,         tmotorNXT, PIDControl, driveRight, encoder)
@@ -12,6 +10,7 @@
 #include "wallfollow2.0.c"
 #include "compassfollow2.0.c"
 #include "mindsensors-motormux.h"
+#include "hitechnic-sensormux.h"
 
 void init(){
 	//ENCODERS//
@@ -44,12 +43,17 @@ task main()
 	tMotor leftSide[1]={left};
 	tMotor rightSide[1]={right};
 
+	tMUXSensor rSonar=
+	tMUXSensor fSonar
+	tMUXSensor bSonar
+
 	init();
 
 	//START
 
 	wallfollow(walldis,speed,dropdis,failsafedis,fSonar,rSonar,leftSide,rightSide);
-
+	MSMMotor(mmotor_S1_1,0);
+	MSMMotor(mmotor_S1_2,0);
 	// ROTATE TO NEW BEARING ON SPOT
 
 	rotateTarget=SensorValue[compass]+20;
@@ -60,7 +64,8 @@ task main()
 	stopdis=50;
 
 	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide);
-
+	MSMMotor(mmotor_S1_1,0);
+	MSMMotor(mmotor_S1_2,0);
 	// THEN DRIVE ON SIMILAR BEARING UNTIL HITS WALL
 
 	rotateTarget=rotateTarget-20;
@@ -71,4 +76,6 @@ task main()
 	stopdis=50;
 
 	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide);
+	MSMMotor(mmotor_S1_1,0);
+	MSMMotor(mmotor_S1_2,0);
 }
