@@ -42,16 +42,18 @@ task main()
 	int stopdis;
 	tMotor leftSide[1]={left};
 	tMotor rightSide[1]={right};
+	tMUXmotor leftSideMUX[1]={mmotor_S1_2};
+	tMUXmotor rightSideMUX[1]={mmotor_S1_1};
 
-	tMUXSensor rSonar=
-	tMUXSensor fSonar
-	tMUXSensor bSonar
+	tMUXSensor rSonar=msensor_S1_3;
+	tMUXSensor fSonar=msensor_S1_1;
+	tMUXSensor bSonar=msensor_S1_2;
 
 	init();
 
 	//START
 
-	wallfollow(walldis,speed,dropdis,failsafedis,fSonar,rSonar,leftSide,rightSide);
+	wallfollow(walldis,speed,dropdis,failsafedis,fSonar,rSonar,leftSide,rightSide,leftSideMUX,rightSideMUX);
 	MSMMotor(mmotor_S1_1,0);
 	MSMMotor(mmotor_S1_2,0);
 	// ROTATE TO NEW BEARING ON SPOT
@@ -63,7 +65,7 @@ task main()
 	timeSensorEnable=300;//10 ms increments
 	stopdis=50;
 
-	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide);
+	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide,leftSideMUX,rightSideMUX);
 	MSMMotor(mmotor_S1_1,0);
 	MSMMotor(mmotor_S1_2,0);
 	// THEN DRIVE ON SIMILAR BEARING UNTIL HITS WALL
@@ -75,7 +77,7 @@ task main()
 	timeSensorEnable=300;//10 ms increments
 	stopdis=50;
 
-	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide);
+	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide,leftSideMUX,rightSideMUX);
 	MSMMotor(mmotor_S1_1,0);
 	MSMMotor(mmotor_S1_2,0);
 }

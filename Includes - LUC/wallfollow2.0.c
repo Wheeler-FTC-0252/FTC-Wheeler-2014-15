@@ -6,18 +6,13 @@
 
 // Now has no motor limit -- 150120
 
-void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fSonar, tMUXSensor rSonar, tMotor *left,tMotor *right, tMUXmotor *leftMUX=16, tMUXmotor *rightMUX=16, bool sounds=false, bool debug=false){
+void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fSonar, tMUXSensor rSonar, tMotor *left,tMotor *right, tMUXmotor *leftMUX, tMUXmotor *rightMUX=16, bool sounds=false, bool debug=false){
 	int delta;
 	int sonarF;
 	int sonarR;
 
-	if (*leftMUX>15){
-		motorSideMUX(leftMUX,speed);
-	}
-
-	if (*rightMUX>15){
-		motorSideMUX(rightMUX,speed);
-	}
+	motorSideMUX(leftMUX,speed);
+	motorSideMUX(rightMUX,speed);
 
 	motorSide(left, speed);
 	motorSide(right, speed);

@@ -6,7 +6,7 @@
 
 // Now has no motor limit -- 150120
 
-void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis,tSensors compass, tMUXSensor bSonar,tMUXSensor rSonar, tMotor *left, tMotor *right,tMUXmotor *leftMUX=16, tMUXmotor *rightMUX=16, bool sounds=false, bool debug=false){
+void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis,tSensors compass, tMUXSensor bSonar,tMUXSensor rSonar, tMotor *left, tMotor *right,tMUXmotor *leftMUX, tMUXmotor *rightMUX, bool sounds=false, bool debug=false){
 	int delta;
 	clearTimer(T1);
 	while(true)
@@ -35,11 +35,15 @@ void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorE
 		if (rotateSpeed!=0){//rotate
 			motorSide(left, (abs(rotateSpeed)*(-delta)));
 			motorSide(right, (abs(rotateSpeed)*(delta)));
+			motorSideMUX(leftMUX, (abs(rotateSpeed)*(-delta)));
+			motorSideMUX(rightMUX, (abs(rotateSpeed)*(delta)));
 			if(abs(delta)<0.05) break;
 		}
 		else{//drive and keep bearing
 			motorSide(left, (speed*(1+delta)));
 			motorSide(right, (speed*(1-delta)));
+			motorSideMUX(leftMUX, (speed*(1+delta)));
+			motorSideMUX(rightMUX, (speed*(1-delta)));
 
 			if (stopDis>-1 || time10[T1]>timeSensorEnable){
 				if (bSonar<stopDis || rSonar<stopDis){
@@ -51,6 +55,8 @@ void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorE
 
 	motorSide(left, 0);
 	motorSide(right, 0);
+	motorSideMUX(leftMUX, 0);
+	motorSideMUX(rightMUX, 0);
 
 	if (sounds){ playSound(soundBeepBeep); while (bSoundActive){}; }
 }
