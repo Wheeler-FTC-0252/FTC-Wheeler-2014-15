@@ -1,8 +1,10 @@
 #include "motorSide.c"
+#include "hitechnic-sensormux.h"
+#include "lego-ultrasound.h"
 
 // Now has no motor limit -- 150120
 
-void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tSensors fSonar, tSensors rSonar, tMotor *left,tMotor *right, bool sounds=false, bool debug=false){
+void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fSonar, tMUXSensor rSonar, tMotor *left,tMotor *right, bool sounds=false, bool debug=false){
 	int delta;
 	int sonarF;
 	int sonarR;

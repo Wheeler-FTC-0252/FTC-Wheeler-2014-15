@@ -1,8 +1,10 @@
 #include "motorSide.c"
+#include "hitechnic-sensormux.h"
+#include "lego-ultrasound.h"
 
 // Now has no motor limit -- 150120
 
-void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis, tSensors compass, tSensors bSonar, tSensors rSonar, tMotor *left, tMotor *right, bool sounds=false, bool debug=false){
+void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis,tSensors compass, tMUXSensor bSonar,tMUXSensor rSonar, tMotor *left, tMotor *right, bool sounds=false, bool debug=false){
 	int delta;
 	clearTimer(T1);
 	while(true)
