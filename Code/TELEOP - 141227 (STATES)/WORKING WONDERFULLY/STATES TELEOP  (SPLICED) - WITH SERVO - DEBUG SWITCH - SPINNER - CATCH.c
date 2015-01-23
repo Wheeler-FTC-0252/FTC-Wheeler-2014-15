@@ -45,7 +45,7 @@ void init(){
 
 task main()
 {
-	bool debug=false;
+	bool debug=true;
 
 	if (debug)writeDebugStreamLine("\n\n\n=====START=======");
 
@@ -59,7 +59,7 @@ task main()
 
 	int armspeed=30;
 	int dband = 10; // Deadband for joystick
-	int joylevels[6]={30,350,2350,4230,5000,5800};//FIRST VALUE IS 5 TO QUICKLY ADDRESS THE DEADBANDING ISSUE
+	int joylevels[6]={30,350,2350,4230,4445,5860};//FIRST VALUE IS 5 TO QUICKLY ADDRESS THE DEADBANDING ISSUE
 
 	bool luccomputer=true;
 
@@ -73,7 +73,7 @@ task main()
 	int spinnerIn=2;
 	int spinnerOut=4;
 	int autoSpinnerButton=16;
-	bool autoSpinner=true;
+	bool autoSpinner=false;
 	int spinnerSpeedOut=255;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD)
 	int spinnerSpeedIn=0;
 
@@ -96,7 +96,7 @@ task main()
 	int tophat;
 	int buttons_joy2;
 	int buttons_joy1;
-	bool dooropen=false;
+	bool dooropen=true;
 	int dooropenpos=120;
 	int doorclosedpos=10;
 	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
