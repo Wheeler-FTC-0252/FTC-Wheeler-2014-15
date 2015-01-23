@@ -11,6 +11,7 @@
 
 #include "wallfollow2.0.c"
 #include "compassfollow2.0.c"
+#include "mindsensors-motormux.h"
 
 void init(){
 	//ENCODERS//
