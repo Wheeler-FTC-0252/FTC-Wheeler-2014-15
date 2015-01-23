@@ -1,5 +1,5 @@
-#pragma config(Sensor, S1,     SMUX,           sensorI2CCustomFastSkipStates)
-#pragma config(Sensor, S4,     compass,        sensorI2CHiTechnicCompass)
+#pragma config(Sensor, S1,     compass,        sensorI2CHiTechnicCompass)
+#pragma config(Sensor, S4,     SMUX,           sensorI2CCustomFastSkipStates)
 #pragma config(Motor,  motorA,          left,          tmotorNXT, PIDControl, driveLeft, encoder)
 #pragma config(Motor,  motorB,          right,         tmotorNXT, PIDControl, driveRight, encoder)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
