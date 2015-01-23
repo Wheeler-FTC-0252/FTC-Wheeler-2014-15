@@ -72,6 +72,8 @@ task main()
 	int doorbutton=1;
 	int spinnerIn=2;
 	int spinnerOut=4;
+	int autoSpinnerButton=16;
+	bool autoSpinner=true;
 	int spinnerSpeedOut=255;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD)
 	int spinnerSpeedIn=0;
 
@@ -177,25 +179,32 @@ task main()
 				dooropen=false;
 				servo[door]=doorclosedpos;
 			}
-			else if (buttons_joy2==spinnerIn && spinneron==false){
-				spinneron=true;//forward
-				servo[spin1]=spinnerSpeedIn;
-				servo[spin2]=spinnerSpeedOut;
+
+			if (!autoSpinner){
+				if (buttons_joy2==spinnerIn && spinneron==false){
+					spinneron=true;//forward
+					servo[spin1]=spinnerSpeedIn;
+					servo[spin2]=spinnerSpeedOut;
+				}
+				else if (buttons_joy2==spinnerIn && spinneron==true){
+					spinneron=false;//stop
+					servo[spin1]=127;
+					servo[spin2]=127;
+				}
+				else if (buttons_joy2==spinnerOut && spinneron== false){
+					spinneron=true;//back
+					servo[spin1]=spinnerSpeedOut;
+					servo[spin2]=spinnerSpeedIn;
+				}
+				else if (buttons_joy2==spinnerOut && spinneron== true){
+					spinneron=false;//stop
+					servo[spin1]=127;
+					servo[spin2]=127;
+				}
 			}
-			else if (buttons_joy2==spinnerIn && spinneron==true){
-				spinneron=false;//stop
-				servo[spin1]=127;
-				servo[spin2]=127;
-			}
-			else if (buttons_joy2==spinnerOut && spinneron== false){
-				spinneron=true;//back
-				servo[spin1]=spinnerSpeedOut;
-				servo[spin2]=spinnerSpeedIn;
-			}
-			else if (buttons_joy2==spinnerOut && spinneron== true){
-				spinneron=false;//stop
-				servo[spin1]=127;
-				servo[spin2]=127;
+
+			if (buttons_joy2==autoSpinnerButton){
+				autoSpinner=!autoSpinner;
 			}
 		}
 		button_old2=buttons_joy2;
@@ -205,15 +214,16 @@ task main()
 		}
 
 		//Spinner Arm Level Check
-		if (nMotorEncoder[arm]>joylevels[1]+50 && (movement==2 || movement==0)){
-			servo[spin1]=spinnerSpeedOut;
-			servo[spin2]=spinnerSpeedIn;
+		if (autoSpinner){
+			if (nMotorEncoder[arm]>joylevels[1]+50 && (movement==2 || movement==0)){
+				servo[spin1]=spinnerSpeedOut;
+				servo[spin2]=spinnerSpeedIn;
+			}
+			else if (nMotorEncoder[arm]<joylevels[1]+50 && (movement==1 || movement==0)){
+				servo[spin1]=spinnerSpeedIn;
+				servo[spin2]=spinnerSpeedOut;
+			}
 		}
-		else if (nMotorEncoder[arm]<joylevels[1]+50 && (movement==1 || movement==0){
-			servo[spin1]=spinnerSpeedIn;
-			servo[spin2]=spinnerSpeedOut;
-		}
-
 
 		//Arm Stop Checking ON LOW LEVEL// -- TO STOP POSITION HOLD WHEN ON LOWEST LEVEL
 		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+20)){
