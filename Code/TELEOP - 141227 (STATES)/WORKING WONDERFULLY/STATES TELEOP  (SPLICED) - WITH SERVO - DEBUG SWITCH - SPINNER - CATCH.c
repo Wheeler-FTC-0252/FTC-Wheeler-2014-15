@@ -24,7 +24,7 @@
 //NOTES FOR NEXT TIME: MAKE A DEAD BAND FOR BOTTOM VALUE <-- also add a push stop (button)
 
 #include "JoystickDriver.c"
-#include "Transfer.c"
+#include "Transfer2.0.c"
 //#include "nMotorEncoderTargetAbs.c"
 
 
@@ -57,12 +57,40 @@ task main()
 	Motor Controller 3 = right motor 1 & 2, spliced
 	right motor 3*/
 
+	//varibles defined
 	int armspeed=30;
 	int dband = 10; // Deadband for joystick
-	int joylevels[6]={30,350,2350,4230,4445,5860};//FIRST VALUE IS 5 TO QUICKLY ADDRESS THE DEADBANDING ISSUE
+	int joylevels[6]={0,350,2350,4230,4445,5860};//FIRST VALUE IS 5 TO QUICKLY ADDRESS THE DEADBANDING ISSUE
+	bool dooropen=true;
+	int dooropenpos=120;
+	int doorclosedpos=10;
+	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
+	int tophat_last=-2; // Used only to decide on chnage event for debug printing
+	bool manualused=false;
+	int loopNum = 0;
+	int button_old1=-1;
+	int button_old2=-1;
+	int movement=0;//0 is stop, 1 is down, 2 is up//
+	int speedGainHigh=2;//faster speed
+	int speedGainLow=1;//slower speed
+	int speedGain=speedGainLow;//(what to multiply the standard gain by)
+	int lowerLevelDb=30;//deadband for tophat on low level
+	int upperLevelDb=30;//deadband for tophat on high level
+	int armLevelDb=30;//used line 301 for deadBanding a check
 
+	//varibles undefined
+	int roundup;
+	int rounddown;
+	int joy_1y1;
+	int joy_1y2;
+	int joy_2y1;
+	int joy_2y2;
+	int tophat;
+	int buttons_joy2;
+	int buttons_joy1;
+
+	//BUTTON SETUP//
 	bool luccomputer=true;
-
 	//for driver joystick
 	int speedButton=32;//please revise
 	int catchEngage=2;
@@ -82,35 +110,12 @@ task main()
 		//driver
 		catchEngage=1;
 		catchDisengage=2;
+
 		//gunner
 		doorbutton=4;
 		spinnerIn=1;
 		spinnerOut=2;
 	}
-
-	int roundup;
-	int rounddown;
-	int joy_1y1;
-	int joy_1y2;
-	int joy_2y1;
-	int joy_2y2;
-	int tophat;
-	int buttons_joy2;
-	int buttons_joy1;
-	bool dooropen=true;
-	int dooropenpos=120;
-	int doorclosedpos=10;
-	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
-	int tophat_last=-2; // Used only to decide on chnage event for debug printing
-	int manualused=0;
-	int loopNum = 0;
-	int button_old1=-1;
-	int button_old2=-1;
-	int movement=0;//0 is stop, 1 is down, 2 is up//
-
-	int speedGainHigh=2;//faster speed
-	int speedGainLow=1;//slower speed
-	int speedGain=speedGainLow;//(what to multiply the standard gain by)
 
 	// Debug initial joystick
 	//	for(int ii=0; ii<10;ii++)
@@ -122,10 +127,10 @@ task main()
 	{
 		loopNum++;
 		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1,(100./320.)*speedGain,dband);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2,(100./320.)*speedGain,dband);
-		joy_2y1=transfer_J_To_M(joystick.joy2_y1,100./640.,dband);//Gunner Joy
-		joy_2y2=transfer_J_To_M(joystick.joy2_y2,100./640.,dband);
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(100./320.)*speedGain);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (100./320.)*speedGain);
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./640.);//Gunner Joy
+		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./640.);
 		tophat=joystick.joy2_TopHat;
 		buttons_joy1=joystick.joy1_Buttons;
 		buttons_joy2=joystick.joy2_Buttons;
@@ -243,7 +248,7 @@ task main()
 
 
 		//Arm Stop Checking ON LOW LEVEL// -- TO STOP POSITION HOLD WHEN ON LOWEST LEVEL
-		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+20)){
+		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+lowerLevelDb)){
 			motor[arm]=0;
 		}
 
@@ -255,73 +260,76 @@ task main()
 				movement=1;
 			}
 
-			manualused=1;
+			manualused=true;
 			nMotorEncoderTarget[arm]=0;
 			motor[arm]=joy_2y1;
 		}
 		else if ((tophat==0 || tophat==4)&&tophat!=tophat_old){//Tophat
 			if (debug)writeDebugStreamLine("ENTERING TOPHAT");
+			manualused=false;
 
-			if (tophat==0){
+			if (tophat==0){//tophat up (auto spinners)
 				movement=2;
 			}
 			else{//tophat down
 				movement=1;
 			}
 
-			for (int ii=0; ii<sizeof(joylevels)/sizeof(joylevels[0]);ii++){
-				if (nMotorEncoder[arm]<=joylevels[0]){
+			//Checking levels if top or bottom, else it goes into for loop
+			if (nMotorEncoder[arm]<=joylevels[0]+lowerLevelDb){
+				if (debug){
+					writeDebugStreamLine("on/below bottom");
+					writeDebugStreamLine("%d",nMotorEncoder[arm]);}
 
-					if (debug){
-						writeDebugStreamLine("below bottom");
-						writeDebugStreamLine("%d",nMotorEncoder[arm]);}
-
-					rounddown=-1;
-					roundup=1;
-					break;
-				}
-				else if(nMotorEncoder[arm]>=joylevels[(sizeof(joylevels)/4)-1]){
-
-					if (debug){
-						writeDebugStreamLine("above top");
-						writeDebugStreamLine("%d",nMotorEncoder[arm]);}
-
-					rounddown=(sizeof(joylevels)/4)-2;
-					//-2 cuz its -1 from the length,cuz it starts at 0. and  another -1 cuz
-					// its the second two last one
-
-					roundup=-1;
-					break;
-				}
-
-				if (joylevels[ii]+5>nMotorEncoder[arm] && joylevels[ii]-5<nMotorEncoder[arm]){
-
-					if (debug)writeDebugStreamLine("%d",nMotorEncoder[arm]);
-
-					rounddown=ii-1;//already know it isnt on bottom or top, cuz the first two if's
-					roundup=ii+1;
-					break;
-				}
-
-				if (nMotorEncoder[arm]>joylevels[ii]&&nMotorEncoder[arm]<joylevels[ii+1]){
-
-					if (debug){
-						writeDebugStreamLine("goldilocks: d: %d, U: %d",rounddown,roundup);
-						writeDebugStreamLine("%d",nMotorEncoder[arm]);
-					}
-
-					rounddown=ii;
-					roundup=ii+1;
-					break;
-				}
-
+				rounddown=-1;
+				roundup=1;
+				break;
 			}
+			else if(nMotorEncoder[arm]>=joylevels[(sizeof(joylevels)/sizeof(joylevels[0]))-1]-upperLevelDb){
+				if (debug){
+					writeDebugStreamLine("above top");
+					writeDebugStreamLine("%d",nMotorEncoder[arm]);}
 
-			if (debug)writeDebugStreamLine("\nrounddown (idx=%d) , roundup (idx=%d)",rounddown,roundup);
-			for (int ii=0; ii<sizeof(joylevels)/sizeof(joylevels[0]);ii++)writeDebugStream("[%d]=%d ,",ii,joylevels[ii]);
-			if (debug)writeDebugStreamLine("\n");
-			if (debug)writeDebugStreamLine("SET MOTOR SPEED to %d from %d in advance of setting target", 0 , motor[arm] );
-			motor[arm]=0;
+				rounddown=(sizeof(joylevels)/sizeof(joylevels[0]))-2;
+				//-2 because it is the second highest level
+
+				roundup=-1;
+				break;
+			}
+			else {
+				for (int ii=0; ii<(sizeof(joylevels)/sizeof(joylevels[0]))-1;ii++){
+					//added -1 to middle condition /\ so the ii+1 wouldn't go over joylevels
+
+					if (joylevels[ii]+armLevelDb<nMotorEncoder[arm] && joylevels[ii]-armLevelDb>nMotorEncoder[arm]){
+						//deadBanded check to see if already on a level
+
+						if (debug)writeDebugStreamLine("%d",nMotorEncoder[arm]);
+
+						rounddown=ii-1;//already know it isnt on bottom or top, cuz the first two if's
+						roundup=ii+1;
+						break;
+					}
+					else if (nMotorEncoder[arm]>joylevels[ii]&&nMotorEncoder[arm]<joylevels[ii+1]){
+						//I know ii+1 wont go above the number of indexes in joylevels because of previous if statements
+						if (debug){
+							writeDebugStreamLine("perfect: d: %d, U: %d",rounddown,roundup);
+							writeDebugStreamLine("%d",nMotorEncoder[arm]);
+						}
+
+						rounddown=ii;
+						roundup=ii+1;
+						break;
+					}
+				}
+			}//end of roundup/rounddown block
+
+			if (debug){
+				writeDebugStreamLine("\nrounddown (idx=%d) , roundup (idx=%d)",rounddown,roundup);
+				for (int ii=0; ii<sizeof(joylevels)/sizeof(joylevels[0]);ii++) writeDebugStream("[%d]=%d ,",ii,joylevels[ii]);
+				writeDebugStreamLine("\n");
+				writeDebugStreamLine("SET MOTOR SPEED to %d from %d in advance of setting target", 0 , motor[arm] );
+			}
+			motor[arm]=0;//setting to 0 is crutial otherwise the encoderTarget wont work
 
 			if (tophat==0 && roundup != -1){//up
 				if (debug)writeDebugStreamLine("DRIVING UP to %d from %d",joylevels[roundup] , nMotorEncoder[arm]);
@@ -339,14 +347,14 @@ task main()
 			}
 			else{
 				if (debug)writeDebugStreamLine("SET MOTOR SPEED to %d from %d", 0 , motor[arm] );
-				motor[arm]=0;
+				motor[arm]=0;//just in case something weird happens
 			}
 		}
-		else if (joy_2y1==0 && manualused==1){//manualused
-			manualused=0;
+		else if (manualused==true){//manualused
+			//150124 /\ removed "joy_2y1==0 &&" because this will only execute if the joy and tophat arn't being used
+			manualused=false;
 			motor[arm]=0;
 		}
-
 		tophat_old=tophat;
 	}
 }
