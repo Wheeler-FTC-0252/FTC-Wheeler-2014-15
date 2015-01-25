@@ -16,8 +16,8 @@
 
 task main()
 {
-	int pos=100;//0 or 120
-	servoChangeRate[catchServo] = 1;
+	int pos=0;//0 or 120
+	servoChangeRate[catchServo] = 2;
 
 	servo[catchServo]=pos;
 	while (true){

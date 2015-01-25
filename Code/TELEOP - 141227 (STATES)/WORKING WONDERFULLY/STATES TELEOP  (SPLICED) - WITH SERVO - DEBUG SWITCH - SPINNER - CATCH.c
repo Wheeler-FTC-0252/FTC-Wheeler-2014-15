@@ -55,7 +55,7 @@ void init(){
 
 task main()
 {
-	bool debug=true;
+	bool debug=false;
 
 	if (debug)writeDebugStreamLine("\n\n\n=====START=======");
 
@@ -70,18 +70,16 @@ task main()
 	//varibles defined
 	int armSpeed=30;
 	int dband = 10; // Deadband for joystick
-	int joylevels[6]={0,350,2350,4230,4445,5860};
+	int joylevels[5]={0,350,2350,4230,4445};
 	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
 	int tophat_last=-2; // Used only to decide on chnage event for debug printing
 	bool manualused=false;
 	int loopNum = 0;
 	int button_old1=-1;
 	int button_old2=-1;
-	//int movement=0;//0 is stop, 1 is down, 2 is up//
-	int speedGainHigh=2;//faster speed
-	int speedGainLow=1;//slower speed
-	int speedGain=speedGainLow;//(what to multiply the standard gain by), INITIALLY SET TO LOW
-
+	float speedGainHigh=2.5;//faster speed
+	float speedGainLow=1;//slower speed
+	float speedGain=speedGainLow;//(what to multiply the standard gain by), INITIALLY SET TO LOW
 	int lowerLevelDb=30;//deadband for tophat on low level
 	int upperLevelDb=30;//deadband for tophat on high level
 	int armLevelDb=30;//used line 301 for deadBanding a check
@@ -101,7 +99,7 @@ task main()
 	bool luccomputer=true; // Set to TRUE if switch on back of controller is set to "X", FALSE if "D"
 
 	//for driver joystick
-	int speedButton=64;
+	int speedButton=32;
 	int catchEngage;
 	int catchDisengage;
 
@@ -114,8 +112,8 @@ task main()
 	bool autoSpinner=false;
 	int spinnerSpeedOut=255;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD)
 	int spinnerSpeedIn=0;
-	int catchDownPos=100;//change in future
-	int catchUpPos=1;
+	int catchDownPos=0;//change in future
+	int catchUpPos=100;
 	bool dooropen=true;
 	int dooropenpos=120;
 	int doorclosedpos=10;
@@ -123,8 +121,8 @@ task main()
 	// These button's change for different controllers
 	if (luccomputer){//if it is on lucs comp (set to X on controller)
 		//driver's control buttons
-		catchEngage=2;
-		catchDisengage=1;
+		catchEngage=1;
+		catchDisengage=2;
 		//gunner's control buttons
 		doorbutton=4;
 		spinnerIn=1;
@@ -155,8 +153,8 @@ task main()
 		//----------------------------JOYSTICK-----------------------------
 		// Controls the wheels and the arm
 		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./320.)*speedGain);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./320.)*speedGain);
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./320.)*(float)speedGain);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./320.)*(float)speedGain);
 		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./640.);//Gunner Joy
 		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./640.);
 		tophat=joystick.joy2_TopHat;
@@ -200,12 +198,12 @@ task main()
 		if (buttons_joy1==speedButton){//speed up button
 			//button is held down
 			speedGain=speedGainHigh;
-			writeDebugStreamLine("SPEED");
+			if (debug)writeDebugStreamLine("SPEED");
 		}
 		else{
 			//button is released
 			speedGain=speedGainLow;
-			writeDebugStreamLine("no speed");
+			if (debug)writeDebugStreamLine("no speed");
 		}
 
 		//Driver Buttons
