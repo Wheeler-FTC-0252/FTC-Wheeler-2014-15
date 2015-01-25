@@ -110,8 +110,8 @@ task main()
 	int spinnerOut;
 	int autoSpinnerButton=32;
 	bool autoSpinner=false;
-	int spinnerSpeedOut=255;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD)
-	int spinnerSpeedIn=0;
+	int spinnerSpeedOut=0;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD) -- spin1 leads
+	int spinnerSpeedIn=255;
 	int catchDownPos=0;//change in future
 	int catchUpPos=100;
 	bool dooropen=true;
@@ -125,8 +125,8 @@ task main()
 		catchDisengage=2;
 		//gunner's control buttons
 		doorbutton=4;
-		spinnerIn=2;
-		spinnerOut=1;
+		spinnerIn=1;
+		spinnerOut=2;
 	}
 	else // "D" type controller
 	{
@@ -234,8 +234,8 @@ task main()
 				if (buttons_joy2==spinnerIn && spinneron==false){
 					if (debug) writeDebugStreamLine("    INHALE spinner");
 					spinneron=true;//forward
-					servo[spin1]=spinnerSpeedIn;
-					servo[spin2]=spinnerSpeedOut;
+					servo[spin1]=spinnerSpeedOut;
+					servo[spin2]=spinnerSpeedIn;
 				}
 				else if ( (buttons_joy2==spinnerIn || buttons_joy2==spinnerOut) && spinneron==true){
 					if (debug) writeDebugStreamLine("    STOP spinner");
@@ -245,8 +245,8 @@ task main()
 				}
 				else if (buttons_joy2==spinnerOut && spinneron== false){
 					spinneron=true;//back
-					servo[spin1]=spinnerSpeedOut;
-					servo[spin2]=spinnerSpeedIn;
+					servo[spin1]=spinnerSpeedIn;
+					servo[spin2]=spinnerSpeedOut;
 				}
 			}
 
@@ -265,11 +265,11 @@ task main()
 		//Spinner Arm Level Check
 
 		if (autoSpinner){
-			if (nMotorEncoder[arm]>joylevels[1] && (movement==2 || movement==0)){
+			if (nMotorEncoder[arm]>joylevels[1] && (movement==2 || movement==0)){//up
 				servo[spin1]=spinnerSpeedOut;//out because spin1 leads
 				servo[spin2]=spinnerSpeedIn;
 			}
-			else if (nMotorEncoder[arm]<joylevels[1] && (movement==1 || movement==0)){
+			else if (nMotorEncoder[arm]<joylevels[1] && (movement==1 || movement==0)){//down
 				servo[spin1]=spinnerSpeedIn;//in
 				servo[spin2]=spinnerSpeedOut;
 			}
@@ -280,7 +280,7 @@ task main()
 		//Arm Stop Checking ON LOW LEVEL// -- TO STOP POSITION HOLD WHEN ON LOWEST LEVEL
 		// We implement a deadband do the motor doesn't keep running when arm is very close to lowest level
 		// *** Could consider having this kick in only after a few seconds at lowest position
-		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+lowe1rLevelDb)){
+		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+lowerLevelDb)){
 			motor[arm]=0;
 		}
 
@@ -374,16 +374,18 @@ task main()
 				nMotorEncoderTarget[arm] = joylevels[roundup] - nMotorEncoder[arm];//setting motorEncoder to "-nMotorEncoderTarget[arm]"
 				//because it is relative
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[roundup], nMotorEncoder[arm]);
-					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", armSpeed , motor[arm] );}
-
-				motor[arm]=armSpeedSpecial(armSpeed, roundup, rounddown);
+					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", armSpeed , motor[arm] );
+				}
+				motor[arm]=armSpeed;
+				//motor[arm]=armSpeedSpecial(armSpeed, roundup, rounddown);
 			}
 			else if (tophat==4 && rounddown != -1){ //down
 				if (debug)writeDebugStreamLine("DRIVING DOWN to %d from %d",joylevels[rounddown], nMotorEncoder[arm]);
 				nMotorEncoderTarget[arm] = (joylevels[rounddown] - nMotorEncoder[arm]);
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[rounddown], nMotorEncoder[arm]);
 					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", -armSpeed , motor[arm] );}
-				motor[arm]=armSpeedSpecial(-armSpeed, roundup, rounddown);
+				motor[arm]=-armSpeed;
+				//motor[arm]=armSpeedSpecial(-armSpeed, roundup, rounddown);
 			}
 			else{
 				if (debug)writeDebugStreamLine("SET MOTOR SPEED to %d from %d", 0 , motor[arm] );
