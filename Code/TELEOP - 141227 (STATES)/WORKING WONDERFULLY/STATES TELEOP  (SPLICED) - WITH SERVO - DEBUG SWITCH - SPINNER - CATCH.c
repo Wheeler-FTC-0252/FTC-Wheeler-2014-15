@@ -69,7 +69,7 @@ task main()
 	//varibles defined
 	int armSpeed=30;
 	int dband = 10; // Deadband for joystick
-	int joylevels[5]={0,500,2350,4230,4445};
+	int joylevels[5]={0,620,2350,4230,4445};
 	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
 	int tophat_last=-2; // Used only to decide on chnage event for debug printing
 	bool manualused=false;
@@ -145,7 +145,11 @@ task main()
 
 
 	init(); // Set up encoders, servos
+
+	//servo sets
 	servo[catchServo]=catchUpPos;
+	servo[spin1]=127;
+	servo[spin2]=127;
 	while (true)
 	{
 		loopNum++;
@@ -198,12 +202,12 @@ task main()
 		if (buttons_joy1==speedButton){//speed up button
 			//button is held down
 			speedGain=speedGainHigh;
-			if (debug)writeDebugStreamLine("SPEED");
+			//if (debug)writeDebugStreamLine("SPEED");
 		}
 		else{
 			//button is released
 			speedGain=speedGainLow;
-			if (debug)writeDebugStreamLine("no speed");
+			//if (debug)writeDebugStreamLine("no speed");
 		}
 
 		//Driver Buttons
@@ -264,7 +268,7 @@ task main()
 
 		//Spinner Arm Level Check
 
-		if (autoSpinner){
+		if (autoSpinner){//auto-spinner block
 			if (nMotorEncoder[arm]<joylevels[1] && (movement==1 || movement==0)){//down or stopped and below joylevels[1]
 				servo[spin1]=spinnerSpeedIn;//in
 				servo[spin2]=spinnerSpeedOut;
