@@ -16,7 +16,7 @@
 
 task main()
 {
-	int pos=0;//0 or 120
+	int pos=100;//0 or 120
 	servoChangeRate[catchServo] = 2;
 
 	servo[catchServo]=pos;

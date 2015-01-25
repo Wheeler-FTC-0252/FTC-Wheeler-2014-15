@@ -29,16 +29,15 @@
 
 int nMotorEncoder_last[11];	// make this available for all motors - to start state when last checked
 
-/*
+
 int armSpeedSpecial(int armSpeed, int roundup, int rounddown){//different speeds for different levels (arm) -- add them HERE
-if (roundup==4 && rounddown==3){
-return armSpeed/2;
+	if (roundup==4 && rounddown==3){
+		return armSpeed/2;
+	}
+	else{
+		return armSpeed;
+	}
 }
-else{
-return armSpeed;
-}
-}
-*/
 
 void init(){
 	//ENCODERS//
@@ -83,6 +82,7 @@ task main()
 	int lowerLevelDb=30;//deadband for tophat on low level
 	int upperLevelDb=30;//deadband for tophat on high level
 	int armLevelDb=30;//used line 301 for deadBanding a check
+	int movement=0;//for auto spinners
 
 	//varibles undefined
 	int roundup;
@@ -108,7 +108,7 @@ task main()
 	int doorbutton;
 	int spinnerIn;
 	int spinnerOut;
-	int autoSpinnerButton=16;//check this
+	int autoSpinnerButton=32;
 	bool autoSpinner=false;
 	int spinnerSpeedOut=255;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD)
 	int spinnerSpeedIn=0;
@@ -125,8 +125,8 @@ task main()
 		catchDisengage=2;
 		//gunner's control buttons
 		doorbutton=4;
-		spinnerIn=1;
-		spinnerOut=2;
+		spinnerIn=2;
+		spinnerOut=1;
 	}
 	else // "D" type controller
 	{
@@ -250,53 +250,51 @@ task main()
 				}
 			}
 
-			/*
 			if (buttons_joy2==autoSpinnerButton){//auto spinner (not working)
-			autoSpinner=!autoSpinner;
+				autoSpinner=!autoSpinner;
 			}
-			*/
 		}
 		button_old2=buttons_joy2;
 
-		/*
+
 		if (nMotorRunState[arm]==runStateIdle){
-		movement=0;
+			movement=0;
 		}
-		*/
+
 
 		//Spinner Arm Level Check
-		/*
+
 		if (autoSpinner){
-		if (nMotorEncoder[arm]>joylevels[1]+50 && (movement==2 || movement==0)){
-		servo[spin1]=spinnerSpeedOut;
-		servo[spin2]=spinnerSpeedIn;
+			if (nMotorEncoder[arm]>joylevels[1] && (movement==2 || movement==0)){
+				servo[spin1]=spinnerSpeedOut;//out because spin1 leads
+				servo[spin2]=spinnerSpeedIn;
+			}
+			else if (nMotorEncoder[arm]<joylevels[1] && (movement==1 || movement==0)){
+				servo[spin1]=spinnerSpeedIn;//in
+				servo[spin2]=spinnerSpeedOut;
+			}
 		}
-		else if (nMotorEncoder[arm]<joylevels[1]+50 && (movement==1 || movement==0)){
-		servo[spin1]=spinnerSpeedIn;
-		servo[spin2]=spinnerSpeedOut;
-		}
-		}
-		*/
+
 
 
 		//Arm Stop Checking ON LOW LEVEL// -- TO STOP POSITION HOLD WHEN ON LOWEST LEVEL
 		// We implement a deadband do the motor doesn't keep running when arm is very close to lowest level
 		// *** Could consider having this kick in only after a few seconds at lowest position
-		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+lowerLevelDb)){
+		if (nMotorRunState[arm]==runStateIdle && (nMotorEncoder[arm]<joylevels[0]+lowe1rLevelDb)){
 			motor[arm]=0;
 		}
 
 
 		if (joy_2y1!=0){
 			// If the gunner's joystick is being used then THIS MANUAL MODE OVERRIDES semi-automatic modes below
-			/*
+
 			if (joy_2y1>0){
-			movement=2;
+				movement=2;
 			}
 			else{//must be down
-			movement=1;
+				movement=1;
 			}
-			*/
+
 
 			manualused=true;
 			nMotorEncoderTarget[arm]=0; // Turn off target value before setting speed
@@ -307,14 +305,14 @@ task main()
 			if (debug)writeDebugStreamLine("ENTERING TOPHAT");
 			manualused=false;
 
-			/*
+
 			if (tophat==0){//tophat up (auto spinners)
-			movement=2;
+				movement=2;
 			}
 			else{//tophat down
-			movement=1;
+				movement=1;
 			}
-			*/
+
 
 			//Checking levels if top or bottom, else it goes into for loop
 			if (nMotorEncoder[arm]<=joylevels[0]+lowerLevelDb){
@@ -378,14 +376,14 @@ task main()
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[roundup], nMotorEncoder[arm]);
 					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", armSpeed , motor[arm] );}
 
-				motor[arm]=armSpeed;
+				motor[arm]=armSpeedSpecial(armSpeed, roundup, rounddown);
 			}
 			else if (tophat==4 && rounddown != -1){ //down
 				if (debug)writeDebugStreamLine("DRIVING DOWN to %d from %d",joylevels[rounddown], nMotorEncoder[arm]);
 				nMotorEncoderTarget[arm] = (joylevels[rounddown] - nMotorEncoder[arm]);
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[rounddown], nMotorEncoder[arm]);
 					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", -armSpeed , motor[arm] );}
-				motor[arm]=-armSpeed;
+				motor[arm]=armSpeedSpecial(-armSpeed, roundup, rounddown);
 			}
 			else{
 				if (debug)writeDebugStreamLine("SET MOTOR SPEED to %d from %d", 0 , motor[arm] );
