@@ -54,7 +54,7 @@ void init(){
 
 task main()
 {
-	bool debug=false;
+	bool debug=true;
 
 	if (debug)writeDebugStreamLine("\n\n\n=====START=======");
 
@@ -269,8 +269,9 @@ task main()
 		//Spinner Arm Level Check
 
 		if (autoSpinner){//auto-spinner block
-			if (nMotorEncoder[arm]<joylevels[1] && time1(T1)>800 && ServoValue[door]== doorclosedpos){
+			if (nMotorEncoder[arm]<joylevels[1] /*&& time1(T1)>800 */&& !dooropen){
 				//shut-off spinners when door is closed (waits a bit)
+				if (debug)writeDebugStreamLine("door closed, stop spinners");
 				servo[spin1]=127;
 				servo[spin2]=127;
 			}
@@ -283,7 +284,8 @@ task main()
 				servo[spin2]=spinnerSpeedIn;
 			}
 
-			if (ServoValue[door]== dooropenpos){
+			if (dooropen){//if the door is open
+				if (debug)writeDebugStreamLine("door closed resetting (%d)",ServoValue[door]);
 				clearTimer(T1);
 			}
 		}
