@@ -115,7 +115,7 @@ task main()
 	int catchDownPos=0;//change in future
 	int catchUpPos=100;
 	bool dooropen=true;
-	int dooropenpos=120;
+	int dooropenpos=150;
 	int doorclosedpos=10;
 
 	// These button's change for different controllers
