@@ -31,12 +31,12 @@ int nMotorEncoder_last[11];	// make this available for all motors - to start sta
 
 /*
 int armSpeedSpecial(int armSpeed, int roundup, int rounddown){//different speeds for different levels (arm) -- add them HERE
-	if (roundup==4 && rounddown==3){
-		return armSpeed/2;
-	}
-	else{
-		return armSpeed;
-	}
+if (roundup==4 && rounddown==3){
+return armSpeed/2;
+}
+else{
+return armSpeed;
+}
 }
 */
 
@@ -55,7 +55,7 @@ void init(){
 
 task main()
 {
-	bool debug=false;
+	bool debug=true;
 
 	if (debug)writeDebugStreamLine("\n\n\n=====START=======");
 
@@ -155,8 +155,8 @@ task main()
 		//----------------------------JOYSTICK-----------------------------
 		// Controls the wheels and the arm
 		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(100./320.)*speedGain);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (100./320.)*speedGain);
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./320.)*speedGain);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./320.)*speedGain);
 		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./640.);//Gunner Joy
 		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./640.);
 		tophat=joystick.joy2_TopHat;
@@ -197,15 +197,16 @@ task main()
 
 
 		//----------------------------BUTTONS-----------------------------
-		if (buttons_joy1==speedButton){//speed up pushs
-					//button is held down
-					speedGain=speedGainHigh;
-				}
-				else{
-					//button is released
-					speedGain=speedGainLow;
-				}
-			}
+		if (buttons_joy1==speedButton){//speed up button
+			//button is held down
+			speedGain=speedGainHigh;
+			writeDebugStreamLine("SPEED");
+		}
+		else{
+			//button is released
+			speedGain=speedGainLow;
+			writeDebugStreamLine("no speed");
+		}
 
 		//Driver Buttons
 		if (buttons_joy1!=button_old1){
@@ -253,7 +254,7 @@ task main()
 
 			/*
 			if (buttons_joy2==autoSpinnerButton){//auto spinner (not working)
-				autoSpinner=!autoSpinner;
+			autoSpinner=!autoSpinner;
 			}
 			*/
 		}
@@ -261,21 +262,21 @@ task main()
 
 		/*
 		if (nMotorRunState[arm]==runStateIdle){
-			movement=0;
+		movement=0;
 		}
 		*/
 
 		//Spinner Arm Level Check
 		/*
 		if (autoSpinner){
-			if (nMotorEncoder[arm]>joylevels[1]+50 && (movement==2 || movement==0)){
-				servo[spin1]=spinnerSpeedOut;
-				servo[spin2]=spinnerSpeedIn;
-			}
-			else if (nMotorEncoder[arm]<joylevels[1]+50 && (movement==1 || movement==0)){
-				servo[spin1]=spinnerSpeedIn;
-				servo[spin2]=spinnerSpeedOut;
-			}
+		if (nMotorEncoder[arm]>joylevels[1]+50 && (movement==2 || movement==0)){
+		servo[spin1]=spinnerSpeedOut;
+		servo[spin2]=spinnerSpeedIn;
+		}
+		else if (nMotorEncoder[arm]<joylevels[1]+50 && (movement==1 || movement==0)){
+		servo[spin1]=spinnerSpeedIn;
+		servo[spin2]=spinnerSpeedOut;
+		}
 		}
 		*/
 
@@ -292,10 +293,10 @@ task main()
 			// If the gunner's joystick is being used then THIS MANUAL MODE OVERRIDES semi-automatic modes below
 			/*
 			if (joy_2y1>0){
-				movement=2;
+			movement=2;
 			}
 			else{//must be down
-				movement=1;
+			movement=1;
 			}
 			*/
 
@@ -310,10 +311,10 @@ task main()
 
 			/*
 			if (tophat==0){//tophat up (auto spinners)
-				movement=2;
+			movement=2;
 			}
 			else{//tophat down
-				movement=1;
+			movement=1;
 			}
 			*/
 
@@ -322,7 +323,7 @@ task main()
 				if (debug){
 					writeDebugStreamLine("on/below bottom");
 					writeDebugStreamLine("%d",nMotorEncoder[arm]);
-					}
+				}
 
 				rounddown=-1;
 				roundup=1;
