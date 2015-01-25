@@ -29,6 +29,7 @@
 
 int nMotorEncoder_last[11];	// make this available for all motors - to start state when last checked
 
+/*
 int armSpeedSpecial(int armSpeed, int roundup, int rounddown){//different speeds for different levels (arm) -- add them HERE
 	if (roundup==4 && rounddown==3){
 		return armSpeed/2;
@@ -37,6 +38,7 @@ int armSpeedSpecial(int armSpeed, int roundup, int rounddown){//different speeds
 		return armSpeed;
 	}
 }
+*/
 
 void init(){
 	//ENCODERS//
@@ -44,6 +46,7 @@ void init(){
 
 	//SERVOS//
 	servoChangeRate[door] = 2;
+	servoChangeRate[catchServo]= 2;
 
 	for (int ii=0; ii<sizeof(nMotorEncoder_last)/sizeof(nMotorEncoder_last[0]);ii++){//debug uses
 		nMotorEncoder_last[ii]=32767;
@@ -52,7 +55,7 @@ void init(){
 
 task main()
 {
-	bool debug=true;
+	bool debug=false;
 
 	if (debug)writeDebugStreamLine("\n\n\n=====START=======");
 
@@ -68,9 +71,6 @@ task main()
 	int armSpeed=30;
 	int dband = 10; // Deadband for joystick
 	int joylevels[6]={0,350,2350,4230,4445,5860};
-	bool dooropen=true;
-	int dooropenpos=120;
-	int doorclosedpos=10;
 	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
 	int tophat_last=-2; // Used only to decide on chnage event for debug printing
 	bool manualused=false;
@@ -115,12 +115,17 @@ task main()
 	bool autoSpinner=false;
 	int spinnerSpeedOut=255;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD)
 	int spinnerSpeedIn=0;
+	int catchDownPos=100;//change in future
+	int catchUpPos=1;
+	bool dooropen=true;
+	int dooropenpos=120;
+	int doorclosedpos=10;
 
 	// These button's change for different controllers
 	if (luccomputer){//if it is on lucs comp (set to X on controller)
 		//driver's control buttons
-		catchEngage=1;
-		catchDisengage=2;
+		catchEngage=2;
+		catchDisengage=1;
 		//gunner's control buttons
 		doorbutton=4;
 		spinnerIn=1;
@@ -143,7 +148,7 @@ task main()
 
 
 	init(); // Set up encoders, servos
-
+	servo[catchServo]=catchUpPos;
 	while (true)
 	{
 		loopNum++;
@@ -196,10 +201,10 @@ task main()
 		//Driver Buttons
 		if (buttons_joy1!=button_old1){
 			if (buttons_joy1==catchEngage){//catch block
-				servo[catchServo]=50;
+				servo[catchServo]=catchDownPos;
 			}
 			else if (buttons_joy1==catchDisengage){
-				servo[catchServo]=90;
+				servo[catchServo]=catchUpPos;
 			}
 
 			if (buttons_joy1==speedButton){//speed up block
@@ -380,14 +385,14 @@ task main()
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[roundup], nMotorEncoder[arm]);
 					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", armSpeed , motor[arm] );}
 
-				motor[arm]=armSpeedSpecial(armSpeed, roundup, rounddown);
+				motor[arm]=armSpeed;
 			}
 			else if (tophat==4 && rounddown != -1){ //down
 				if (debug)writeDebugStreamLine("DRIVING DOWN to %d from %d",joylevels[rounddown], nMotorEncoder[arm]);
 				nMotorEncoderTarget[arm] = (joylevels[rounddown] - nMotorEncoder[arm]);
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[rounddown], nMotorEncoder[arm]);
 					writeDebugStreamLine("SET MOTOR SPEED to %d from %d", -armSpeed , motor[arm] );}
-				motor[arm]=armSpeedSpecial(-armSpeed, roundup, rounddown);
+				motor[arm]=-armSpeed;
 			}
 			else{
 				if (debug)writeDebugStreamLine("SET MOTOR SPEED to %d from %d", 0 , motor[arm] );

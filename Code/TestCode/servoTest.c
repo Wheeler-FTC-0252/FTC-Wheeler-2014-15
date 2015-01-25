@@ -6,7 +6,7 @@
 #pragma config(Motor,  mtr_S1_C2_2,     motorG,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_1,     motorH,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_2,     motorI,        tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C4_1,    door,                 tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_1,    servo1,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_4,    catchServo,           tServoStandard)
@@ -16,10 +16,10 @@
 
 task main()
 {
-	int pos=0;//0 or 120
-	servoChangeRate[door] = 1;
+	int pos=100;//0 or 120
+	servoChangeRate[catchServo] = 1;
 
-	servo[door]=pos;
+	servo[catchServo]=pos;
 	while (true){
 	}
 }
