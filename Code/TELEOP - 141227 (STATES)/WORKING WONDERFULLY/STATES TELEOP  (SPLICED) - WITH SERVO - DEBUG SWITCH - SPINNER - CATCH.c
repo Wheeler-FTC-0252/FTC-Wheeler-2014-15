@@ -69,7 +69,7 @@ task main()
 	//varibles defined
 	int armSpeed=30;
 	int dband = 10; // Deadband for joystick
-	int joylevels[5]={0,350,2350,4230,4445};
+	int joylevels[5]={0,500,2350,4230,4445};
 	int tophat_old=-1; // Last tophat value, initialize in Neutral position -1
 	int tophat_last=-2; // Used only to decide on chnage event for debug printing
 	bool manualused=false;
@@ -265,13 +265,13 @@ task main()
 		//Spinner Arm Level Check
 
 		if (autoSpinner){
-			if (nMotorEncoder[arm]>joylevels[1] && (movement==2 || movement==0)){//up
-				servo[spin1]=spinnerSpeedOut;//out because spin1 leads
-				servo[spin2]=spinnerSpeedIn;
-			}
-			else if (nMotorEncoder[arm]<joylevels[1] && (movement==1 || movement==0)){//down
+			if (nMotorEncoder[arm]<joylevels[1] && (movement==1 || movement==0)){//down or stopped and below joylevels[1]
 				servo[spin1]=spinnerSpeedIn;//in
 				servo[spin2]=spinnerSpeedOut;
+			}
+			else if (movement==2 || movement==0){//up or stopped (stopped but is above joylevels[1])
+				servo[spin1]=spinnerSpeedOut;//out because spin1 leads
+				servo[spin2]=spinnerSpeedIn;
 			}
 		}
 
