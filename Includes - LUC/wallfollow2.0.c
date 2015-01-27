@@ -6,7 +6,7 @@
 // Now has no motor limit -- 150120
 
 void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fSonar, tMUXSensor rSonar, tMotor *left,tMotor *right, bool sounds=false, bool debug=false){
-	int delta;
+	float delta;
 	int sonarF;
 	int sonarR;
 
@@ -21,11 +21,17 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 		sonarF = USreadDist(fSonar);
 		sonarR = USreadDist(rSonar);
 
+		if (abs(nMotorEncoder[firstLeftMotor])>4500 || abs(nMotorEncoder[firstRightMotor])>4500){
+			walldis=10;
+		}
+
 		if (debug){
-			nxtDisplayCenteredTextLine(2,"MotL: %3d",nMotorEncoder[firstLeftMotor]);
-			nxtDisplayCenteredTextLine(3,"MotR: %3d",nMotorEncoder[firstRightMotor]);
-			nxtDisplayCenteredTextLine(4,"SonF: %3d cm",sonarF);
-			nxtDisplayCenteredTextLine(5,"SonR: %3d cm",sonarR);
+			nxtDisplayCenteredTextLine(1,"left: %1.3f",/*(float)speed* */(1.+(float)delta));
+			nxtDisplayCenteredTextLine(2,"Right: %1.3f",/*(float)speed* */(1.-(float)delta));
+			nxtDisplayCenteredTextLine(3,"MotL: %3d",nMotorEncoder[firstLeftMotor]);
+			nxtDisplayCenteredTextLine(4,"MotR: %3d",nMotorEncoder[firstRightMotor]);
+			nxtDisplayCenteredTextLine(5,"SonF: %3d cm",sonarF);
+			nxtDisplayCenteredTextLine(6,"SonR: %3d cm",sonarR);
 		}
 
 		if (sonarF<dropdis){
@@ -40,17 +46,19 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 		else {
 			// motor[left]=speed;
 			// Fractional miss
-			delta = (float)sonarR/(float)walldis-1;
+			delta = ((float)sonarR/(float)walldis-1);
 			// Bounds check since we don't want robot to stop, or reverse a side
 			if(abs(delta)>0.9) delta= sgn(delta)*0.9;
 
 			if (debug){
-				nxtDisplayCenteredTextLine(6,"delta:%5.1f%%",100.*delta);
-				writeDebugStreamLine("delta:%f",delta);
+				writeDebugStreamLine("Left ENC: %d, Right ENC: %d",nMotorEncoder[firstLeftMotor],nMotorEncoder[firstRightMotor]);
+//				writeDebugStreamLine("sonarR/walldis-1=%f (delta)",(delta);
+				nxtDisplayCenteredTextLine(7,"delta:%5.1f%%",100.*delta);
+				//writeDebugStreamLine("delta:%f",delta);
 			}
 
-			motorSide(left, (speed*(1+delta)));
-			motorSide(right, (speed*(1-delta)));
+			motorSide(left, (speed*(1+sgn(speed)*delta)));
+			motorSide(right, (speed*(1-sgn(speed)*delta)));
 		}
 	}
 	motorSide(left, 0);

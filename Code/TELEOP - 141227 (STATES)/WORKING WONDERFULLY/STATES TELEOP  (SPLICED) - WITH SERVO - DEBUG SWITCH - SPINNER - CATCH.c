@@ -116,7 +116,7 @@ task main()
 	int catchUpPos=100;
 	bool dooropen=true;
 	int dooropenpos=150;
-	int doorclosedpos=10;
+	int doorclosedpos=5;
 
 	// These button's change for different controllers
 	if (luccomputer){//if it is on lucs comp (set to X on controller)
@@ -170,7 +170,7 @@ task main()
 		motor[BLeft]=joy_1y1;
 		motor[FRight]=joy_1y2;
 		motor[BRight]=joy_1y2;
-		if (false){
+		if (true){
 			writeDebugStreamLine("left: %d, right: %d",nMotorEncoder[FLeft],nMotorEncoder[FRight]);
 		}
 
