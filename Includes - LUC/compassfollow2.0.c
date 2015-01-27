@@ -5,12 +5,12 @@
 
 // Now has no motor limit -- 150120
 
-void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorEnable, bool sonarStop, int stopDis,tSensors compass, tMUXSensor bSonar,tMUXSensor rSonar, tMotor *left, tMotor *right, bool sounds=false, bool debug=false){
+void compassfollow(int speed, int rotateSpeed, int rotateRelative, int timeSensorEnable, bool sonarStop, int stopDis,tSensors compass, tMUXSensor bSonar,tMUXSensor rSonar, tMotor *left, tMotor *right, bool sounds=false, bool debug=false){
 	float delta;
 	clearTimer(T1);
 	while(true)
 	{
-		delta = ((float)SensorValue[compass] - (float)rotateTarget);
+		delta = ((float)SensorValue[compass] - (((float)SensorValue[compass] + (float)rotateRelative)%360));
 		// Make it so that +angle is heading to right of target (so steer left)
 		//  and -ve angle is heading to left of target (so steer right)
 		delta = (delta+180 % 360)-180; // Stops problems when close to north
@@ -25,9 +25,9 @@ void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorE
 			nxtDisplayCenteredTextLine(6,"delta:%5.1f%%",100.*delta);
 			// writeDebugStreamLine("Rotate delta:%f",delta);
 
-			writeDebugStreamLine("Angle sensor:%5d , target %5d ,  delta %5.1f"
+			writeDebugStreamLine("Angle sensor:%5d , relativeTarget %5d ,  delta %5.1f"
 			,SensorValue[compass]
-			, rotateTarget
+			, rotateRelative
 			, delta);
 		}
 
