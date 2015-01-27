@@ -1,5 +1,4 @@
 #include "motorSide.c"
-#include "motorSideMUX.c"
 #include "hitechnic-sensormux.h"
 #include "lego-ultrasound.h"
 #include "mindsensors-motormux.h"
@@ -35,15 +34,12 @@ void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorE
 		if (rotateSpeed!=0){//rotate
 			motorSide(left, (abs(rotateSpeed)*(-delta)));
 			motorSide(right, (abs(rotateSpeed)*(delta)));
-			motorSideMUX(leftMUX, (abs(rotateSpeed)*(-delta)));
-			motorSideMUX(rightMUX, (abs(rotateSpeed)*(delta)));
+
 			if(abs(delta)<0.05) break;
 		}
 		else{//drive and keep bearing
 			motorSide(left, (speed*(1+delta)));
 			motorSide(right, (speed*(1-delta)));
-			motorSideMUX(leftMUX, (speed*(1+delta)));
-			motorSideMUX(rightMUX, (speed*(1-delta)));
 
 			if (stopDis>-1 || time1[T1]>timeSensorEnable){
 				if (bSonar<stopDis || rSonar<stopDis){
@@ -55,8 +51,6 @@ void compassfollow(int speed, int rotateSpeed, int rotateTarget, int timeSensorE
 
 	motorSide(left, 0);
 	motorSide(right, 0);
-	motorSideMUX(leftMUX, 0);
-	motorSideMUX(rightMUX, 0);
 
 	if (sounds){ playSound(soundBeepBeep); while (bSoundActive){}; }
 }

@@ -1,5 +1,4 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     compass,        sensorI2CHiTechnicCompass)
 #pragma config(Sensor, S4,     SMUX,           sensorI2CCustomFastSkipStates)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
@@ -78,7 +77,7 @@ task main()
 	wait1Msec(1000);
 
 	motor[arm]=0;
-	nMotorEncoderTarget[arm]=4550;
+	nMotorEncoderTarget[arm]=4600;
 	motor[arm]=armSpeed;
 	servo[spin1]=0;
 	servo[spin2]=255;
@@ -89,17 +88,18 @@ task main()
 		}
 	}
 	motor[arm]=0;
+	wait1Msec(5000);
 
 
 	// ROTATE TO NEW BEARING ON SPOT
-	rotateTarget=SensorValue[compass]+20;
-	speed = 50;
+	rotateTarget=20;
+	speed = 0;
 	rotateSpeed=50;
 	sonarStop = false;
 	timeSensorEnable=300;//10 ms increments
 	stopdis=50;
 
-	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide,true,true);
+	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,lSonar,leftSide,rightSide,true,true);
 
 	/*
 	// THEN DRIVE ON SIMILAR BEARING UNTIL HITS WALL
