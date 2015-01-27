@@ -19,7 +19,7 @@
 
 task main()
 {
-const tMUXSensor LEGOUS = msensor_S4_4;
+const tMUXSensor LEGOUS = msensor_S4_2;
 int dist=0;
 	while (true){
 		dist = USreadDist(LEGOUS);

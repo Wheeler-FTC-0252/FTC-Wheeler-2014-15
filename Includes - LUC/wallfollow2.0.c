@@ -10,27 +10,26 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 	int sonarF;
 	int sonarR;
 
+
 	motorSide(left, speed);
 	motorSide(right, speed);
 
 	tMotor firstLeftMotor=left[0];
 	tMotor firstRightMotor=right[0];
 
-	while (nMotorEncoder[firstLeftMotor]<failsafedis || nMotorEncoder[firstRightMotor]<failsafedis){
-
-		firstLeftMotor=left[0];
-		firstRightMotor=right[0];
+	while (abs(nMotorEncoder[firstLeftMotor])<abs(failsafedis) || abs(nMotorEncoder[firstRightMotor])<abs(failsafedis)){
 		sonarF = USreadDist(fSonar);
 		sonarR = USreadDist(rSonar);
 
 		if (debug){
-			nxtDisplayCenteredTextLine(2,"MotL: %3d",motor[left]);
-			nxtDisplayCenteredTextLine(3,"MotR: %3d",motor[right]);
+			nxtDisplayCenteredTextLine(2,"MotL: %3d",nMotorEncoder[firstLeftMotor]);
+			nxtDisplayCenteredTextLine(3,"MotR: %3d",nMotorEncoder[firstRightMotor]);
 			nxtDisplayCenteredTextLine(4,"SonF: %3d cm",sonarF);
 			nxtDisplayCenteredTextLine(5,"SonR: %3d cm",sonarR);
 		}
 
 		if (sonarF<dropdis){
+			if (debug)writeDebugStreamLine("saw something");
 			break;
 		}
 
@@ -51,7 +50,7 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 			}
 
 			motorSide(left, (speed*(1+delta)));
-			motorSide(left, (speed*(1-delta)));
+			motorSide(right, (speed*(1-delta)));
 		}
 	}
 	motorSide(left, 0);

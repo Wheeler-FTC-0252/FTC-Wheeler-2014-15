@@ -1,9 +1,9 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CHiTechnicCompass)
-#pragma config(Motor,  motorA,          unused1,       tmotorNXT, PIDControl, encoder)
-#pragma config(Motor,  motorB,          unused2,       tmotorNXT, PIDControl, encoder)
-#pragma config(Motor,  motorC,          unused3,       tmotorNXT, PIDControl, encoder)
+#pragma config(Motor,  motorA,          unused1,       tmotorNXT, openLoop)
+#pragma config(Motor,  motorB,          unused2,       tmotorNXT, openLoop)
+#pragma config(Motor,  motorC,          unused3,       tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     unused4,       tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     arm,           tmotorTetrix, PIDControl, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     FLeft,         tmotorTetrix, PIDControl, driveLeft, encoder)
@@ -170,6 +170,9 @@ task main()
 		motor[BLeft]=joy_1y1;
 		motor[FRight]=joy_1y2;
 		motor[BRight]=joy_1y2;
+		if (false){
+			writeDebugStreamLine("left: %d, right: %d",nMotorEncoder[FLeft],nMotorEncoder[FRight]);
+		}
 
 		if (debug){
 			//writeDebugStreamLine("%d",ServoValue[door]);//STATUS PRINTS

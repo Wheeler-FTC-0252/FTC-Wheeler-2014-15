@@ -3,13 +3,13 @@ Motor Map
 Sensor Port 1:
 	1. Motor Controller
 		1. nothing
-		2. arm
+		2. arm - reversed
 	2. Motor Controller - (left)
 		1. front two
 		2. back one
 	3. Motor Controller - (right)
-		1. front two
-		2. back one
+		1. front two - reversed
+		2. back one - reversed
 	4. Servo Controller
 		1. door - 180
 		2. spin 1 - CR
