@@ -9,8 +9,7 @@
 
 #include "wallfollow2.0.c"
 #include "compassfollow2.0.c"
-#include "mindsensors-motormux.h"
-#include "hitechnic-sensormux.h"
+#include "hitechnic-sensormux.h"//put this before other third party ones
 
 void init(){
 	//ENCODERS//
@@ -35,29 +34,25 @@ task main()
 	int failsafedis=600*(fieldlength/19);//600 on the motor encoder results in moving 19 cm
 	int dropdis=10;//cm
 	int walldis=20;//cm
-	int speed=50;
+	int speed=-50;//for wall follow
 	int rotateSpeed;
 	bool sonarStop;
 	int timeSensorEnable;
 	int stopdis;
 	tMotor leftSide[1]={left};
 	tMotor rightSide[1]={right};
-	tMUXmotor leftSideMUX[1]={mmotor_S1_2};
-	tMUXmotor rightSideMUX[1]={mmotor_S1_1};
-
-	tMUXSensor rSonar=msensor_S1_3;
-	tMUXSensor fSonar=msensor_S1_1;
-	tMUXSensor bSonar=msensor_S1_2;
+	tMUXSensor lSonar=msensor_S4_2;
+	tMUXSensor fSonar=msensor_S4_1;
+	tMUXSensor bSonar=msensor_S4_3;
 
 	init();
 
 	//START
 
-	wallfollow(walldis,speed,dropdis,failsafedis,fSonar,rSonar,leftSide,rightSide,leftSideMUX,rightSideMUX);
-	MSMMotor(mmotor_S1_1,0);
-	MSMMotor(mmotor_S1_2,0);
-	// ROTATE TO NEW BEARING ON SPOT
+	wallfollow(walldis,speed,dropdis,failsafedis,bSonar,lSonar,leftSide,rightSide,true,true);
 
+	/*
+	// ROTATE TO NEW BEARING ON SPOT
 	rotateTarget=SensorValue[compass]+20;
 	speed = 0;
 	rotateSpeed=50;
@@ -80,4 +75,5 @@ task main()
 	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide,leftSideMUX,rightSideMUX);
 	MSMMotor(mmotor_S1_1,0);
 	MSMMotor(mmotor_S1_2,0);
+	*/
 }

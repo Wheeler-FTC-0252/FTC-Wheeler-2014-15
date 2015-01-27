@@ -1,27 +1,27 @@
 #include "motorSide.c"
-#include "motorSideMUX.c"
 #include "hitechnic-sensormux.h"
 #include "lego-ultrasound.h"
 #include "mindsensors-motormux.h"
 
 // Now has no motor limit -- 150120
 
-void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fSonar, tMUXSensor rSonar, tMotor *left,tMotor *right, tMUXmotor *leftMUX, tMUXmotor *rightMUX=16, bool sounds=false, bool debug=false){
+void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fSonar, tMUXSensor rSonar, tMotor *left,tMotor *right, bool sounds=false, bool debug=false){
 	int delta;
 	int sonarF;
 	int sonarR;
 
-	motorSideMUX(leftMUX,speed);
-	motorSideMUX(rightMUX,speed);
-
 	motorSide(left, speed);
 	motorSide(right, speed);
 
+	tMotor firstLeftMotor=left[0];
+	tMotor firstRightMotor=right[0];
 
-	while (nMotorEncoder[left]<failsafedis || nMotorEncoder[right]<failsafedis){
+	while (nMotorEncoder[firstLeftMotor]<failsafedis || nMotorEncoder[firstRightMotor]<failsafedis){
 
-		sonarF = SensorValue[fSonar];
-		sonarR = SensorValue[rSonar];
+		firstLeftMotor=left[0];
+		firstRightMotor=right[0];
+		sonarF = USreadDist(fSonar);
+		sonarR = USreadDist(rSonar);
 
 		if (debug){
 			nxtDisplayCenteredTextLine(2,"MotL: %3d",motor[left]);
@@ -41,7 +41,7 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 		else {
 			// motor[left]=speed;
 			// Fractional miss
-			delta = (float)SensorValue[rSonar]/(float)walldis-1;
+			delta = (float)sonarR/(float)walldis-1;
 			// Bounds check since we don't want robot to stop, or reverse a side
 			if(abs(delta)>0.9) delta= sgn(delta)*0.9;
 
@@ -51,7 +51,7 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 			}
 
 			motorSide(left, (speed*(1+delta)));
-			motorSide(left, (speed*1/(1+delta)));
+			motorSide(left, (speed*(1-delta)));
 		}
 	}
 	motorSide(left, 0);
