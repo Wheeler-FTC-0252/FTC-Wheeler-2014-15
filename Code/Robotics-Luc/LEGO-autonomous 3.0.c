@@ -1,5 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S2,     compass,        sensorI2CHiTechnicCompass)
+#pragma config(Sensor, S3,     touch,          sensorTouch)
 #pragma config(Sensor, S4,     SMUX,           sensorI2CCustomFastSkipStates)
 #pragma config(Motor,  motorA,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
@@ -26,8 +27,6 @@
 
 void init(){
 	//ENCODERS//
-	nMotorEncoder[left]=0;
-	nMotorEncoder[right]=0;
 
 	//SERVO//
 	servoChangeRate[door]=2;
@@ -43,19 +42,18 @@ task main()
 	//	int rotateAmount=20;//rotate amount in degrees for second part
 	//	int rotateTarget=compOffSet;//for 2nd half
 	int rotateTarget;
-
+	bool debug=true;
 	//	int rotateSpeed=50;
 
 	int fieldlength=176;//cm
 	int failsafedis=-25600;//600*(fieldlength/19);//600 on the motor encoder results in moving 19 cm
 	int dropdis=9;//cm
-	int walldis=20;//cm
-	int speed=-30;//for wall follow
-	int armSpeed=10;
+	int walldis=10;//cm
+	int speed=-60;//for wall follow
+	int armSpeed=20;
 	int rotateSpeed;
-	bool sonarStop;
-	int timeSensorEnable;
-	int stopdis;
+	int timeSensorEnable=0;
+	int stopDis;
 	tMotor leftSide[2]={leftSpliced, left};
 	tMotor rightSide[2]={rightSpliced, right};
 	tMUXSensor lSonar=msensor_S4_2;
@@ -63,56 +61,84 @@ task main()
 	tMUXSensor bSonar=msensor_S4_3;
 
 	init();
-	servo[door]=10;
+
+	tMotor motorName;
+
+	for (int ii=0; ii<2; ii++){
+		motorName=leftSide[ii];
+		nMotorEncoder[motorName]=0;
+	}
+
+	for (int ii=0; ii<2; ii++){
+		motorName=rightSide[ii];
+		nMotorEncoder[motorName]=0;
+	}
+
+	servo[door]=5;
+	servo[spin1]=127;
+	servo[spin2]=127;
 	//START
+
 	servo[catchServo]=100;//catch up
 	wallfollow(walldis,speed,dropdis,failsafedis,bSonar,lSonar,leftSide,rightSide,true,true);
 	servo[catchServo]=0;//catch down
 	wait1Msec(1000);
 
-	servo[door]=150;
+/*	servo[door]=150; //old/complicated other one works better
 	wait1Msec(300);
 	servo[spin1]=255;
 	servo[spin2]=0;
 	wait1Msec(1000);
+	servo[spin1]=127;
+	servo[spin2]=127;
+	wait1Msec(200);
+*/
 
 	motor[arm]=0;
-	nMotorEncoderTarget[arm]=4600;
+	nMotorEncoderTarget[arm]=4510;
 	motor[arm]=armSpeed;
-	servo[spin1]=0;
-	servo[spin2]=255;
+	servo[spin1]=104;
+	servo[spin2]=150;
 	while (nMotorRunState[arm]!=runStateIdle){
+		if (debug)writeDebugStreamLine("ARM ENC: %d", nMotorEncoder[arm]);
 		if (nMotorEncoder[arm]>500){
+			servo[door]=150;
 			servo[spin1]=127;
 			servo[spin2]=127;
 		}
 	}
 	motor[arm]=0;
-	wait1Msec(5000);
+	wait1Msec(1000);
+
+	//SECOND Lurch//
+	motor[arm]=0;
+	nMotorEncoderTarget[arm]=80;
+	motor[arm]=armSpeed;
+	while (nMotorRunState[arm]!=runStateIdle){
+		if (debug)writeDebugStreamLine("ARM ENC: %d", nMotorEncoder[arm]);
+	}
+	motor[arm]=0;
+	wait1Msec(500);
 
 
 	// ROTATE TO NEW BEARING ON SPOT
 	rotateTarget=20;
-	speed = 0;
-	rotateSpeed=50;
-	sonarStop = false;
-	timeSensorEnable=300;//10 ms increments
-	stopdis=50;
+	speed = 100;
 
-	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,lSonar,leftSide,rightSide,true,true);
+	compassfollow(speed,rotateTarget,compass,bSonar,lSonar,leftSide,rightSide,true,-1,-1,true,true);
 
-	/*
+	//RETRACT ARM//
+	motor[arm]=-armSpeed*4;
+	while (SensorValue[touch]!=1){
+	}
+	motor[arm]=0;
+
 	// THEN DRIVE ON SIMILAR BEARING UNTIL HITS WALL
+	rotateTarget=25;
+	speed = 100;
+	timeSensorEnable=0;//1 ms increments
+	stopDis=30;
 
-	rotateTarget=rotateTarget-20;
-	speed = 50;
-	rotateSpeed=0;
-	sonarStop = true;
-	timeSensorEnable=300;//10 ms increments
-	stopdis=50;
+	compassfollow(speed,rotateTarget,compass,fSonar,lSonar,leftSide,rightSide,false,stopDis,timeSensorEnable, true,true);
 
-	compassfollow(speed,rotateSpeed,rotateTarget,timeSensorEnable,sonarStop,stopdis,compass,bSonar,rSonar,leftSide,rightSide,leftSideMUX,rightSideMUX);
-	MSMMotor(mmotor_S1_1,0);
-	MSMMotor(mmotor_S1_2,0);
-	*/
 }

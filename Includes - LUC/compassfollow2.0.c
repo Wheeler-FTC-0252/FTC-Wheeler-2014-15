@@ -5,12 +5,31 @@
 
 // Now has no motor limit -- 150120
 
-void compassfollow(int speed, int rotateSpeed, int rotateRelative, int timeSensorEnable, bool sonarStop, int stopDis,tSensors compass, tMUXSensor bSonar,tMUXSensor rSonar, tMotor *left, tMotor *right, bool sounds=false, bool debug=false){
+void compassfollow(int speed, int rotateRelative, tSensors compass, tMUXSensor bSonar,tMUXSensor lSonar, tMotor *left, tMotor *right, bool rotateOnly=true,int stopDis=-1, int timeSensorEnable=-1, bool sounds=false, bool debug=false){
 	float delta;
+	int sonarB;
+	int sonarR;
+
+	int rotateTarget=((SensorValue[compass] + rotateRelative)%360);
+
+	tMotor motorName;
+
+	for (int ii=0; ii<2; ii++){
+		motorName=left[ii];
+		nMotorEncoder[motorName]=0;
+	}
+
+	for (int ii=0; ii<2; ii++){
+		motorName=right[ii];
+		nMotorEncoder[motorName]=0;
+	}
+
 	clearTimer(T1);
 	while(true)
 	{
-		delta = ((float)SensorValue[compass] - (((float)SensorValue[compass] + (float)rotateRelative)%360));
+		sonarB = USreadDist(msensor_S4_4);//bSonar);
+		sonarR = USreadDist(lSonar);
+		delta = ((float)SensorValue[compass] - (float)rotateTarget);
 		// Make it so that +angle is heading to right of target (so steer left)
 		//  and -ve angle is heading to left of target (so steer right)
 		delta = (delta+180 % 360)-180; // Stops problems when close to north
@@ -25,24 +44,27 @@ void compassfollow(int speed, int rotateSpeed, int rotateRelative, int timeSenso
 			nxtDisplayCenteredTextLine(6,"delta:%5.1f%%",100.*delta);
 			// writeDebugStreamLine("Rotate delta:%f",delta);
 
-			writeDebugStreamLine("Angle sensor:%5d , relativeTarget %5d ,  delta %5.1f"
+			writeDebugStreamLine("Angle sensor:%5d , Target %5d ,  delta %5.1f"
 			,SensorValue[compass]
-			, rotateRelative
+			, rotateTarget
 			, delta);
 		}
 
-		if (rotateSpeed!=0){//rotate
-			motorSide(left, (abs(rotateSpeed)*(-delta)));
-			motorSide(right, (abs(rotateSpeed)*(delta)));
+		if (rotateOnly){//rotate
+			if(debug)writeDebugStreamLine("rotate only");
+			motorSide(left, (abs(speed)*(-delta)*2));
+			motorSide(right, (abs(speed)*(delta)*2));
 
 			if(abs(delta)<0.05) break;
 		}
 		else{//drive and keep bearing
-			motorSide(left, (speed*(1+delta)));
-			motorSide(right, (speed*(1-delta)));
+			if(debug)writeDebugStreamLine("drive & keep baring");
+			motorSide(right, (speed*(1+sgn(speed)*delta)));
+			motorSide(left, (speed*(1-sgn(speed)*delta)));
 
-			if (stopDis>-1 || time1[T1]>timeSensorEnable){
-				if (bSonar<stopDis || rSonar<stopDis){
+			if (stopDis>-1 && (time1[T1]>timeSensorEnable || timeSensorEnable<0)){
+				if (sonarB<stopDis){
+					if(debug)writeDebugStreamLine("saw wall (sensor: %d)",sonarB);
 					break;
 				}
 			}

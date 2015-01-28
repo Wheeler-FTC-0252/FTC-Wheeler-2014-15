@@ -9,7 +9,17 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 	float delta;
 	int sonarF;
 	int sonarR;
+	tMotor motorName;
 
+	for (int ii=0; ii<2; ii++){
+		motorName=left[ii];
+		nMotorEncoder[motorName]=0;
+	}
+
+	for (int ii=0; ii<2; ii++){
+		motorName=right[ii];
+		nMotorEncoder[motorName]=0;
+	}
 
 	motorSide(left, speed);
 	motorSide(right, speed);
@@ -21,9 +31,12 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 		sonarF = USreadDist(fSonar);
 		sonarR = USreadDist(rSonar);
 
-		if (abs(nMotorEncoder[firstLeftMotor])>4500 || abs(nMotorEncoder[firstRightMotor])>4500){
+		/*
+		if (abs(nMotorEncoder[firstLeftMotor])>4500 || abs(nMotorEncoder[firstRightMotor])>4500){//if off the ramp
+			if (debug)writeDebugStreamLine("off the ramp");
 			walldis=10;
 		}
+		*/
 
 		if (debug){
 			nxtDisplayCenteredTextLine(1,"left: %1.3f",/*(float)speed* */(1.+(float)delta));
@@ -34,8 +47,17 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 			nxtDisplayCenteredTextLine(6,"SonR: %3d cm",sonarR);
 		}
 
+		if (SensorValue[sonarF]<dropDis+10){//ENCODER LEVELS ARE FAKE
+			//to slow goal docking
+			speed=speed/2;
+		}
+
 		if (sonarF<dropdis){
 			if (debug)writeDebugStreamLine("saw something");
+			motorSide(left, speed);
+			motorSide(right, speed);
+			wait1Msec(1000);
+			writeDebugStreamLine("finished waiting shunt");
 			break;
 		}
 
@@ -61,6 +83,7 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 			motorSide(right, (speed*(1-sgn(speed)*delta)));
 		}
 	}
+
 	motorSide(left, 0);
 	motorSide(right, 0);
 
