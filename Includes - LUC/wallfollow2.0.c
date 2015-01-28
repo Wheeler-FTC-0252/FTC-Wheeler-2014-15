@@ -9,6 +9,7 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 	float delta;
 	int sonarF;
 	int sonarR;
+	bool speedSlowed=false;
 	tMotor motorName;
 
 	for (int ii=0; ii<2; ii++){
@@ -47,9 +48,10 @@ void wallfollow(int walldis,int speed,int dropdis,int failsafedis, tMUXSensor fS
 			nxtDisplayCenteredTextLine(6,"SonR: %3d cm",sonarR);
 		}
 
-		if (SensorValue[sonarF]<dropDis+10){//ENCODER LEVELS ARE FAKE
+		if (SensorValue[sonarF]<dropDis+5 && !speedSlowed){//ENCODER LEVELS ARE FAKE
 			//to slow goal docking
 			speed=speed/2;
+			speedSlowed=true;
 		}
 
 		if (sonarF<dropdis){
