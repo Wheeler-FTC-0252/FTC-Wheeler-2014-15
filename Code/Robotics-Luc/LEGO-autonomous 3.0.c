@@ -144,7 +144,7 @@ task main()
 	motor[arm]=0;
 
 	// THEN DRIVE ON SIMILAR BEARING UNTIL HITS WALL
-	rotateTarget=30;
+	rotateTarget=15;
 	speed = 100;
 	timeSensorEnable=0;//1 ms increments
 	stopDis=20;

@@ -101,7 +101,7 @@ int walldis
 			break;
 		}
 
-		if ( sonarR>25 || abs(sonarR-walldis)<1 ){//deadband or if it cant see the wall (also deadbanded)
+		if ( sonarR>25 || abs(sonarR-walldis)<3 ){//deadband or if it cant see the wall (also deadbanded)
 			if (debug)writeDebugStreamLine("doesn't see wall");
 			motorSide(left, speed);
 			motorSide(right, speed);

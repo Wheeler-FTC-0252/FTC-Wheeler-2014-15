@@ -22,7 +22,7 @@
 // Drives backward
 task main {
 int powerone = -75
-int waittime = 2000
+int waittime = 2500
 
 motor[leftspliced] = powerone;
 motor[left] = powerone;
