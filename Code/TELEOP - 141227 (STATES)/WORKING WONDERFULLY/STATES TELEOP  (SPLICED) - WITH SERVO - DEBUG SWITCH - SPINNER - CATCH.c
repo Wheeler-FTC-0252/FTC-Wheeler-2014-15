@@ -54,7 +54,7 @@ void init(){
 
 task main()
 {
-	bool debug=true;
+	bool debug=false;
 
 	if (debug)writeDebugStreamLine("\n\n\n=====START=======");
 

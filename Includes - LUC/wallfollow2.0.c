@@ -17,7 +17,7 @@ int walldis
 
 	// USER SELECTABLE PARAMETERS
 	int offRampDist=-12799;// Distance that means off of ramp
-	int shuntDist=300;// How much to push the container after it's sensed
+	int shuntDist=500;// How much to push the container after it's sensed
 	int speedReductionFactor = 3; // What factor to reduce speed by when slowing, for dock
 	int speedMinimum = 10; // Minium speed for slow speed
 
