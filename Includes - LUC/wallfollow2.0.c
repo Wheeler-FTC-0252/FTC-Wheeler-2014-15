@@ -6,20 +6,23 @@
 // Now has no motor limit -- 150120
 
 void wallfollow(
-		int walldis
-		,int speed
-		,int dropdis
-		,int failsafedis
-		, tMUXSensor fSonar, tMUXSensor rSonar
-		, tMotor *left,tMotor *right
-		, bool sounds=false
-		, bool debug=false){
+int walldis
+,int speed
+,int dropdis
+,int failsafedis
+, tMUXSensor fSonar, tMUXSensor rSonar
+, tMotor *left,tMotor *right
+, bool sounds=false
+, bool debug=false){
 
 	// USER SELECTABLE PARAMETERS
+	int offRampDist=-12799;// Distance that means off of ramp
+	int shuntDist=300;// How much to push the container after it's sensed
 	int speedReductionFactor = 3; // What factor to reduce speed by when slowing, for dock
 	int speedMinimum = 10; // Minium speed for slow speed
 
 	// OTHER VARIABLES
+	int wheelEncoderBeginning;// For final container push
 	float delta;
 	int sonarF; // Distance from front
 	int sonarR; // Distance from right
@@ -48,18 +51,27 @@ void wallfollow(
 	// LOOP UNTIL WE FIND THE GOAL
 	// FAILSAFE IF WE TRAVEL TOO FAR
 	while (
-			abs(nMotorEncoder[firstLeftMotor])<abs(failsafedis) || abs(nMotorEncoder[firstRightMotor])<abs(failsafedis)
-		){
+		abs(nMotorEncoder[firstLeftMotor])<abs(failsafedis) || abs(nMotorEncoder[firstRightMotor])<abs(failsafedis)
+	){
 
 		sonarF = USreadDist(fSonar);
 		sonarR = USreadDist(rSonar);
 
-		/*
-		if (abs(nMotorEncoder[firstLeftMotor])>4500 || abs(nMotorEncoder[firstRightMotor])>4500){//if off the ramp
+
+		if (abs(nMotorEncoder[firstLeftMotor])>abs(offRampDist) || abs(nMotorEncoder[firstRightMotor])>abs(offRampDist)){//if off the ramp
 			if (debug)writeDebugStreamLine("off the ramp");
-			walldis=10;
+
+			// APPROACHING GOAL SLOWDOWN
+			if ( sonarF < dropdis+5 && !speedSlowed){
+				//to slow goal docking
+				if (debug) writeDebugStreamLine("SLOW DOWN BY FACTOR %d SINCE NEAR GOAL, Front distance = %d cm" , speedReductionFactor , sonarF );
+				speedsgn = sgn( speed );
+				speed = speed / speedReductionFactor;
+				// Check to make sure speed reduction isn't too low - must keep robot moving
+				if( abs(speed) < abs(speedMinimum) ) speed = speedsgn * speedMinimum;
+				speedSlowed=true;
+			}
 		}
-		*/
 
 		if (debug){
 			nxtDisplayCenteredTextLine(1,"left: %1.3f",/*(float)speed* */(1.+(float)delta));
@@ -70,28 +82,27 @@ void wallfollow(
 			nxtDisplayCenteredTextLine(6,"SonR: %3d cm",sonarR);
 		}
 
-		// APPROACHING GOAL
-		if ( sonarF < dropdis+5 && !speedSlowed){//ENCODER LEVELS ARE FAKE
-			//to slow goal docking
-			if (debug) writeDebugStreamLine("SLOW DOWN BY FACTOR %d SINCE NEAR GOAL, Front distance = %d cm" , speedReductionFactor , sonarF );
-		  speedsgn = sgn( speed );
-			speed = speed / speedReductionFactor;
-			// Check to make sure speed reduction isn't too low - must keep robot moving
-			if( abs(speed) < abs(speedMinimum) ) speed = speedsgn * speedMinimum;
-			speedSlowed=true;
-		}
-
 		if (sonarF<dropdis){
 			if (debug) writeDebugStreamLine("VERY NEAR GOAL, Front distance = %d cm" , sonarF );
 			if (debug) writeDebugStreamLine("MOVE FORWARD FOR A LITTLE LONGER" );
 			motorSide(left, speed);
 			motorSide(right, speed);
-			wait1Msec(1000);
+
+			wheelEncoderBeginning=nMotorEncoder[firstLeftMotor];
+			if (debug)writeDebugStreamLine("SHUNTING");
+			while (abs(nMotorEncoder[firstLeftMotor])-abs(wheelEncoderBeginning)<shuntDist){
+
+			}
+			if (debug)writeDebugStreamLine("FINISHED SHUNTING");
+			motorSide(left, 0);
+			motorSide(right, 0);
+
 			if (debug) writeDebugStreamLine("STOP MOVING, Front distance = %d cm" , sonarF );
 			break;
 		}
 
-		if ( sonarR>254 || abs(sonarR-walldis)<1 ){//deadband or if it cant see the wall
+		if ( sonarR>25 || abs(sonarR-walldis)<1 ){//deadband or if it cant see the wall (also deadbanded)
+			if (debug)writeDebugStreamLine("doesn't see wall");
 			motorSide(left, speed);
 			motorSide(right, speed);
 		}
@@ -108,7 +119,7 @@ void wallfollow(
 
 			if (debug){
 				writeDebugStreamLine("Left ENC: %d, Right ENC: %d",nMotorEncoder[firstLeftMotor],nMotorEncoder[firstRightMotor]);
-//				writeDebugStreamLine("sonarR/walldis-1=%f (delta)",(delta);
+				//				writeDebugStreamLine("sonarR/walldis-1=%f (delta)",(delta);
 				nxtDisplayCenteredTextLine(7,"delta:%5.1f%%",100.*delta);
 				//writeDebugStreamLine("delta:%f",delta);
 			}

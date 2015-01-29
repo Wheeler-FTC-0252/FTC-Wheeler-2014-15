@@ -48,7 +48,7 @@ task main()
 	int fieldlength=176;//cm
 	int failsafedis=-25600;//600*(fieldlength/19);//600 on the motor encoder results in moving 19 cm
 	int dropdis    = 9;//cm
-	int walldis    = 10;//cm
+	int walldis    = 15;//cm
 	int speed      = -60;//for wall follow
 	int armSpeed   = 20;
 	int rotateSpeed;
@@ -74,7 +74,7 @@ task main()
 		nMotorEncoder[motorName]=0;
 	}
 
-	servo[door]=5; //door closed
+	servo[door]=10; //door closed
 	servo[spin1]=127; // not spinning
 	servo[spin2]=127; // not spinning
 	servo[catchServo]=100;//catch up
@@ -87,7 +87,7 @@ task main()
 	// ADJACENT TO GOAL, PUT CATCH DOWN
 	if (debug)writeDebugStreamLine("\n********************\nOVERLAPPING GOAL\n");
 	servo[catchServo]=0;//catch down
-	wait1Msec(1000);
+	wait1Msec(500);
 	if (debug)writeDebugStreamLine("\n********************\nCATCH IS DOWN\n");
 
 /*	servo[door]=150; //old/complicated other one works better
@@ -103,7 +103,7 @@ task main()
 	if (debug)writeDebugStreamLine("\n********************\nPUT THE ARM UP\n");
 
 	motor[arm]=0;
-	nMotorEncoderTarget[arm]=4510;
+	nMotorEncoderTarget[arm]=4500;
 	motor[arm]=armSpeed;
 	servo[spin1]=104;
 	servo[spin2]=150;
@@ -144,11 +144,16 @@ task main()
 	motor[arm]=0;
 
 	// THEN DRIVE ON SIMILAR BEARING UNTIL HITS WALL
-	rotateTarget=25;
+	rotateTarget=30;
 	speed = 100;
 	timeSensorEnable=0;//1 ms increments
-	stopDis=30;
+	stopDis=20;
 
 	compassfollow(speed,rotateTarget,compass,fSonar,lSonar,leftSide,rightSide,false,stopDis,timeSensorEnable, true,true);
 
+	// Rotate to get in the parking zong
+	rotateTarget=50;
+	speed = 50;
+
+	compassfollow(speed,rotateTarget,compass,bSonar,lSonar,leftSide,rightSide,true,-1,-1,true,true);
 }

@@ -170,7 +170,7 @@ task main()
 		motor[BLeft]=joy_1y1;
 		motor[FRight]=joy_1y2;
 		motor[BRight]=joy_1y2;
-		if (true){
+		if (debug && true){
 			writeDebugStreamLine("left: %d, right: %d",nMotorEncoder[FLeft],nMotorEncoder[FRight]);
 		}
 
