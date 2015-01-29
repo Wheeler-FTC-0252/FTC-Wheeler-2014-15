@@ -47,10 +47,10 @@ task main()
 
 	int fieldlength=176;//cm
 	int failsafedis=-25600;//600*(fieldlength/19);//600 on the motor encoder results in moving 19 cm
-	int dropdis=9;//cm
-	int walldis=10;//cm
-	int speed=-60;//for wall follow
-	int armSpeed=20;
+	int dropdis    = 9;//cm
+	int walldis    = 10;//cm
+	int speed      = -60;//for wall follow
+	int armSpeed   = 20;
 	int rotateSpeed;
 	int timeSensorEnable=0;
 	int stopDis;
@@ -74,15 +74,21 @@ task main()
 		nMotorEncoder[motorName]=0;
 	}
 
-	servo[door]=5;
-	servo[spin1]=127;
-	servo[spin2]=127;
-	//START
-
+	servo[door]=5; //door closed
+	servo[spin1]=127; // not spinning
+	servo[spin2]=127; // not spinning
 	servo[catchServo]=100;//catch up
+
+	//START MOVING DOWN RAMP FOLLOWING WALL
+	if (debug)writeDebugStreamLine("\n********************\nSTART WALL FOLLOWING\n");
 	wallfollow(walldis,speed,dropdis,failsafedis,bSonar,lSonar,leftSide,rightSide,true,true);
+	if (debug)writeDebugStreamLine("\n********************\nEND WALL FOLLOWING\n");
+
+	// ADJACENT TO GOAL, PUT CATCH DOWN
+	if (debug)writeDebugStreamLine("\n********************\nOVERLAPPING GOAL\n");
 	servo[catchServo]=0;//catch down
 	wait1Msec(1000);
+	if (debug)writeDebugStreamLine("\n********************\nCATCH IS DOWN\n");
 
 /*	servo[door]=150; //old/complicated other one works better
 	wait1Msec(300);
@@ -94,6 +100,8 @@ task main()
 	wait1Msec(200);
 */
 
+	if (debug)writeDebugStreamLine("\n********************\nPUT THE ARM UP\n");
+
 	motor[arm]=0;
 	nMotorEncoderTarget[arm]=4510;
 	motor[arm]=armSpeed;
@@ -102,6 +110,7 @@ task main()
 	while (nMotorRunState[arm]!=runStateIdle){
 		if (debug)writeDebugStreamLine("ARM ENC: %d", nMotorEncoder[arm]);
 		if (nMotorEncoder[arm]>500){
+			if (debug)writeDebugStreamLine("\n********************\nOPEN DOOR\n");
 			servo[door]=150;
 			servo[spin1]=127;
 			servo[spin2]=127;
@@ -111,6 +120,7 @@ task main()
 	wait1Msec(1000);
 
 	//SECOND Lurch//
+	if (debug)writeDebugStreamLine("\n********************\nSECOND LURCH\n");
 	motor[arm]=0;
 	nMotorEncoderTarget[arm]=80;
 	motor[arm]=armSpeed;
