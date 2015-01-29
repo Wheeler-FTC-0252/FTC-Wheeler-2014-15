@@ -24,7 +24,7 @@ task main {
 int powerone = 75
 int powertwo = 50
 int powerthree = 25
-int waittimeone = 1000
+int waittimeone = 2500
 int waittimetwo = 2000
 int waittimethree = 3000
 
@@ -40,10 +40,10 @@ motor[rightspliced] = 0; //stop
 motor[right] = 0;
 wait1Msec(500);
 
-motor[leftspliced] = -powertwo;
-motor[left] = -powertwo;
-motor[rightspliced] = powertwo; // turn left
-motor[right] = powertwo;
+motor[leftspliced] = powertwo;
+motor[left] = powertwo;
+motor[rightspliced] = -powertwo; // turn left
+motor[right] = -powertwo;
 wait1Msec(waittimetwo); //this will need to be tested;
 
 motor[leftspliced] = 0;
@@ -58,10 +58,16 @@ motor[rightspliced] = -powerthree; // go straight
 motor[right] = -powerthree;
 wait1Msec(waittimethree);
 
-motor[leftspliced] = -powertwo;
-motor[left] = -powertwo;
-motor[rightspliced] = powertwo; // turn left around 90 degrees
-motor[right] = powertwo;
+motor[leftspliced] = 0;
+motor[left] = 0;
+motor[rightspliced] = 0; //stop
+motor[right] = 0;
+wait1Msec(500);
+
+motor[leftspliced] = powertwo;
+motor[left] = powertwo;
+motor[rightspliced] = -powertwo; // turn left around 90 degrees
+motor[right] = -powertwo;
 wait1Msec(waittimetwo); //this will need to be tested; degree = 90
 
 motor[leftspliced] = 0;
@@ -82,10 +88,10 @@ motor[rightspliced] = 0; //stop
 motor[right] = 0;
 wait1Msec(500);
 
-motor[leftspliced] = -powertwo;
-motor[left] = -powertwo;
-motor[rightspliced] = powertwo; // turn left around 90 degrees
-motor[right] = powertwo;
+motor[leftspliced] = powertwo;
+motor[left] = powertwo;
+motor[rightspliced] = -powertwo; // turn left around 90 degrees
+motor[right] = -powertwo;
 wait1Msec(waittimetwo); //this will need to be tested; degree = 90
 
 motor[leftspliced] = 0;
