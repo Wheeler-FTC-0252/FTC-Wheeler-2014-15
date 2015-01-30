@@ -82,7 +82,7 @@ task main()
 	int lowerLevelDb=30;//deadband for tophat on low level
 	int upperLevelDb=30;//deadband for tophat on high level
 	int armLevelDb=30;//used line 301 for deadBanding a check
-	int movement=0;//for auto spinners
+	int movement=0;//for auto spinners 0 = off, 1 = down, 2 = up
 
 	//varibles undefined
 	int roundup;
@@ -302,6 +302,9 @@ task main()
 			motor[arm]=0;
 		}
 
+		if (SensorValue[touch]==1 && movement==1){//down and is pushing button
+			motor[arm]=0;
+		}
 
 		if (joy_2y1!=0){
 			// If the gunner's joystick is being used then THIS MANUAL MODE OVERRIDES semi-automatic modes below
