@@ -1,6 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     ,               sensorI2CHiTechnicCompass)
+#pragma config(Sensor, S3,     touch,          sensorTouch)
 #pragma config(Motor,  motorA,          unused1,       tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,          unused2,       tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,          unused3,       tmotorNXT, openLoop)
@@ -45,7 +45,7 @@ void init(){
 
 	//SERVOS//
 	servoChangeRate[door] = 2;
-	servoChangeRate[catchServo]= 2;
+	servoChangeRate[catchServo]= 5;
 
 	for (int ii=0; ii<sizeof(nMotorEncoder_last)/sizeof(nMotorEncoder_last[0]);ii++){//debug uses
 		nMotorEncoder_last[ii]=32767;
@@ -76,9 +76,9 @@ task main()
 	int loopNum = 0;
 	int button_old1=-1;
 	int button_old2=-1;
-	float speedGainHigh=2.5;//faster speed
-	float speedGainLow=1;//slower speed
-	float speedGain=speedGainLow;//(what to multiply the standard gain by), INITIALLY SET TO LOW
+	float speedGainHigh=1;//faster speed
+	float speedGainLow=0.5;//slower speed
+	float speedGain=speedGainHigh;//(what to multiply the standard gain by), INITIALLY SET TO LOW
 	int lowerLevelDb=30;//deadband for tophat on low level
 	int upperLevelDb=30;//deadband for tophat on high level
 	int armLevelDb=30;//used line 301 for deadBanding a check
@@ -157,10 +157,10 @@ task main()
 		//----------------------------JOYSTICK-----------------------------
 		// Controls the wheels and the arm
 		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./320.)*(float)speedGain);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./320.)*(float)speedGain);
-		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./640.);//Gunner Joy
-		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./640.);
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./160.)*(float)speedGain);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./160.)*(float)speedGain);
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./320.);//Gunner Joy
+		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./320.);
 		tophat=joystick.joy2_TopHat;
 		buttons_joy1=joystick.joy1_Buttons;
 		buttons_joy2=joystick.joy2_Buttons;
@@ -204,12 +204,12 @@ task main()
 		//----------------------------BUTTONS-----------------------------
 		if (buttons_joy1==speedButton){//speed up button
 			//button is held down
-			speedGain=speedGainHigh;
+			speedGain=speedGainLow;
 			//if (debug)writeDebugStreamLine("SPEED");
 		}
 		else{
 			//button is released
-			speedGain=speedGainLow;
+			speedGain=speedGainHigh;
 			//if (debug)writeDebugStreamLine("no speed");
 		}
 
@@ -316,7 +316,13 @@ task main()
 
 			manualused=true;
 			nMotorEncoderTarget[arm]=0; // Turn off target value before setting speed
-			motor[arm]=joy_2y1;
+
+			if (movement==1 && SensorValue[touch]){
+				nMotorEncoder[arm]=0;
+			}
+			else {
+				motor[arm]=joy_2y1;
+			}
 		}
 		else if ((tophat==0 || tophat==4)&&tophat!=tophat_old){//Tophat
 			// SEMI-AUTOMATIC MODE
@@ -397,7 +403,7 @@ task main()
 				motor[arm]=armSpeed;
 				//motor[arm]=armSpeedSpecial(armSpeed, roundup, rounddown);
 			}
-			else if (tophat==4 && rounddown != -1){ //down
+			else if (tophat==4 && rounddown != -1 && SensorValue[touch]!=1){ //down and arm button isn't pushed
 				if (debug)writeDebugStreamLine("DRIVING DOWN to %d from %d",joylevels[rounddown], nMotorEncoder[arm]);
 				nMotorEncoderTarget[arm] = (joylevels[rounddown] - nMotorEncoder[arm]);
 				if (debug){writeDebugStreamLine("doing %d = %d - %d", nMotorEncoderTarget[arm], joylevels[rounddown], nMotorEncoder[arm]);

@@ -24,6 +24,7 @@
 #include "wallfollow2.0.c"
 #include "compassfollow2.0.c"
 #include "hitechnic-sensormux.h"//put this before other third party ones
+#include "JoystickDriver.c"
 
 void init(){
 	//ENCODERS//
@@ -38,6 +39,8 @@ void init(){
 
 task main()
 {
+
+	waitForStart();
 	//	int compOffSet=SensorValue[compass];
 	//	int rotateAmount=20;//rotate amount in degrees for second part
 	//	int rotateTarget=compOffSet;//for 2nd half
@@ -60,11 +63,8 @@ task main()
 	tMUXSensor fSonar=msensor_S4_4;
 	tMUXSensor bSonar=msensor_S4_3;
 
-	init();
-
 	tMotor motorName;
-
-	for (int ii=0; ii<2; ii++){
+	for (int ii=0; ii<2; ii++){//resetting encoders
 		motorName=leftSide[ii];
 		nMotorEncoder[motorName]=0;
 	}
@@ -74,6 +74,7 @@ task main()
 		nMotorEncoder[motorName]=0;
 	}
 
+	init();
 	servo[door]=10; //door closed
 	servo[spin1]=127; // not spinning
 	servo[spin2]=127; // not spinning
