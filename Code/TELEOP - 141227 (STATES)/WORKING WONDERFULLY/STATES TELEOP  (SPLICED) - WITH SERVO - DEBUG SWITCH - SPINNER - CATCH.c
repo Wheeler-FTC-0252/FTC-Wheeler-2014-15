@@ -128,7 +128,7 @@ task main()
 		spinnerIn=1;
 		spinnerOut=2;
 	}
-	else // "D" type controller
+	else // "D" type controller (for competition)
 	{
 		//driver's control buttons
 		catchEngage=2;

@@ -2,8 +2,12 @@
 
 task main()
 {
+	int joyButtons_old=0;
 	while (true){
 		getJoystickSettings(joystick);
-		writeDebugStreamLine("%d",joystick.joy1_Buttons);
+		if (joystick.joy1_Buttons!=joyButtons_old){
+			writeDebugStreamLine("%d",joystick.joy1_Buttons);
+		}
+		joyButtons_old=joystick.joy1_Buttons;
 	}
 }
