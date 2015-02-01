@@ -30,7 +30,7 @@ void init(){
 	//ENCODERS//
 
 	//SERVO//
-	servoChangeRate[door]=2;
+	//servoChangeRate[door]=2;
 
 	//SOUND//
 	nVolume = 2;
@@ -45,14 +45,14 @@ task main()
 	//	int rotateAmount=20;//rotate amount in degrees for second part
 	//	int rotateTarget=compOffSet;//for 2nd half
 	int rotateTarget;
-	bool debug=true;
+	bool debug=false;
 	//	int rotateSpeed=50;
 
 	int fieldlength=176;//cm
 	int failsafedis=-25600;//600*(fieldlength/19);//600 on the motor encoder results in moving 19 cm
 	int dropdis    = 9;//cm
 	int walldis    = 15;//cm
-	int speed      = -60;//for wall follow
+	int speed      = -80;//for wall follow
 	int armSpeed   = 20;
 	int rotateSpeed;
 	int timeSensorEnable=0;
@@ -64,6 +64,8 @@ task main()
 	tMUXSensor bSonar=msensor_S4_3;
 
 	USreadDist(fSonar);//dummy to stop random 0 from passing
+	USreadDist(bSonar);//dummy to stop random 0 from passing
+	USreadDist(lSonar);//dummy to stop random 0 from passing
 
 	tMotor motorName;
 	for (int ii=0; ii<2; ii++){//resetting encoders
@@ -76,6 +78,7 @@ task main()
 		nMotorEncoder[motorName]=0;
 	}
 
+	servo[door]=10; //door closed -- doubling over as an attempt to fix servo bug
 	init();
 	servo[door]=10; //door closed
 	servo[spin1]=127; // not spinning

@@ -76,9 +76,12 @@ task main()
 	int loopNum = 0;
 	int button_old1=-1;
 	int button_old2=-1;
-	float speedGainHigh=1;//faster speed
-	float speedGainLow=0.5;//slower speed
-	float speedGain=speedGainHigh;//(what to multiply the standard gain by), INITIALLY SET TO LOW
+	float speedGainDriveHigh=1;//faster speed
+	float speedGainDriveLow=0.5;//slower speed
+	float speedGainDrive=speedGainDriveHigh;//(what to multiply the standard gain by), INITIALLY SET TO LOW
+	float speedGainArmHigh=1;
+	float speedGainArmLow=0.5;
+	float speedGainArm=speedGainArmHigh;//(what to multiply the standard gain by), INITIALLY SET TO LOW
 	int lowerLevelDb=30;//deadband for tophat on low level
 	int upperLevelDb=30;//deadband for tophat on high level
 	int armLevelDb=30;//used line 301 for deadBanding a check
@@ -96,10 +99,10 @@ task main()
 	int buttons_joy1;
 
 	//BUTTON SETUP//
-	bool luccomputer=true; // Set to TRUE if switch on back of controller is set to "X", FALSE if "D"
+	bool luccomputer=false; // Set to TRUE if switch on back of controller is set to "X", FALSE if "D"
 
 	//for driver joystick
-	int speedButton=32;
+	int speedButtonDrive=32;
 	int catchEngage;
 	int catchDisengage;
 
@@ -108,7 +111,8 @@ task main()
 	int doorbutton;
 	int spinnerIn;
 	int spinnerOut;
-	int autoSpinnerButton=32;
+	int speedButtonArm;
+//	int autoSpinnerButton=32;
 	bool autoSpinner=false;
 	int spinnerSpeedOut=0;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD) -- spin1 leads
 	int spinnerSpeedIn=255;
@@ -127,16 +131,22 @@ task main()
 		doorbutton=4;
 		spinnerIn=1;
 		spinnerOut=2;
+		speedButtonArm=32;
 	}
 	else // "D" type controller (for competition)
 	{
 		//driver's control buttons
 		catchEngage=2;
 		catchDisengage=4;
+		speedButtonDrive=32;
+
 		//gunner's control buttons
 		doorbutton=1;
 		spinnerIn=2;
 		spinnerOut=4;
+		speedButtonArm=32;
+		//autoSpinnerButton=32;
+
 	}
 
 	// Debug initial joystick
@@ -157,10 +167,10 @@ task main()
 		//----------------------------JOYSTICK-----------------------------
 		// Controls the wheels and the arm
 		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./160.)*(float)speedGain);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./160.)*(float)speedGain);
-		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./320.);//Gunner Joy
-		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./320.);
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband,(150./192.)*(float)speedGainDrive);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, (150./192.)*(float)speedGainDrive);
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, (100./320.)*(float)speedGainArm);//Gunner Joy
+		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, (100./320.)*(float)speedGainArm);
 		tophat=joystick.joy2_TopHat;
 		buttons_joy1=joystick.joy1_Buttons;
 		buttons_joy2=joystick.joy2_Buttons;
@@ -202,18 +212,19 @@ task main()
 
 
 		//----------------------------BUTTONS-----------------------------
-		if (buttons_joy1==speedButton){//speed up button
+
+		//Driver Buttons
+		if (buttons_joy1==speedButtonDrive){//speed up button
 			//button is held down
-			speedGain=speedGainLow;
+			speedGainDrive=speedGainDriveLow;
 			//if (debug)writeDebugStreamLine("SPEED");
 		}
 		else{
 			//button is released
-			speedGain=speedGainHigh;
+			speedGainDrive=speedGainDriveHigh;
 			//if (debug)writeDebugStreamLine("no speed");
 		}
 
-		//Driver Buttons
 		if (buttons_joy1!=button_old1){
 			if (buttons_joy1==catchEngage){//catch block
 				servo[catchServo]=catchDownPos;
@@ -225,6 +236,17 @@ task main()
 		button_old1=buttons_joy1;
 
 		//Gunner Buttons
+		if (buttons_joy2==speedButtonArm){//arm slow down button
+			//button is held down
+			speedGainArm=speedGainArmLow;
+			if (debug)writeDebugStreamLine("arm slow");
+		}
+		else{
+			//button is released
+			speedGainArm=speedGainArmHigh;
+			if (debug)writeDebugStreamLine("arm normal");
+		}
+
 		if (buttons_joy2!=button_old2){
 			if (buttons_joy2==doorbutton && dooropen==false){//open door
 				if (debug) writeDebugStreamLine("    OPEN door");
@@ -256,10 +278,10 @@ task main()
 					servo[spin2]=spinnerSpeedOut;
 				}
 			}
-
+/*
 			if (buttons_joy2==autoSpinnerButton){//auto spinner (not working)
 				autoSpinner=!autoSpinner;
-			}
+			}*/
 		}
 		button_old2=buttons_joy2;
 

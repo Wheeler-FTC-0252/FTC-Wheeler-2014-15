@@ -55,8 +55,16 @@ int walldis
 	){
 
 		sonarF = USreadDist(fSonar);
-		sonarR = USreadDist(rSonar);
+		if (sonarF==0){
+			if (debug)writeDebugStreamLine("tube sonar GLICHED (saw 0)");
+			sonarF=255;
+		}
 
+		sonarR = USreadDist(rSonar);
+		if (sonarR==0){
+			sonarR=255;
+			if (debug)writeDebugStreamLine("wall sonar GLICHED (saw 0)");
+		}
 
 		if (abs(nMotorEncoder[firstLeftMotor])>abs(offRampDist) || abs(nMotorEncoder[firstRightMotor])>abs(offRampDist)){//if off the ramp
 			if (debug)writeDebugStreamLine("off the ramp");
