@@ -87,7 +87,7 @@ task main()
 
 	//START MOVING DOWN RAMP FOLLOWING WALL
 	if (debug)writeDebugStreamLine("\n********************\nSTART WALL FOLLOWING\n");
-	wallfollow(walldis,speed,dropdis,failsafedis,bSonar,lSonar,leftSide,rightSide,true,true);
+	wallfollow(walldis,speed,dropdis,failsafedis,bSonar,lSonar,leftSide,rightSide,-12799, 500, 3,true,true);
 	if (debug)writeDebugStreamLine("\n********************\nEND WALL FOLLOWING\n");
 
 	// ADJACENT TO GOAL, PUT CATCH DOWN

@@ -12,13 +12,18 @@ int walldis
 ,int failsafedis
 , tMUXSensor fSonar, tMUXSensor rSonar
 , tMotor *left,tMotor *right
-, bool sounds=false
-, bool debug=false){
+, int offRampDist = -1 // Once wheel encoder level goes above this, it starts checking for container -- -1 means no checking
+, int shuntDist = -1 // How much to push the container after it's sensed - -1 means none
+, int slowDownDis = -1 // -1 means none
+, int speedReductionFactor = -1 // What factor to reduce speed by when slowing, for dock -- if slowDownDis == -1 it isn't used
+//, int speedMinimum = -1 // Minium speed for slow speed -- if slowDownDis == -1 it isn't used
+, bool sounds = false
+, bool debug = false){
 
 	// USER SELECTABLE PARAMETERS
-	int offRampDist=-12799;// Distance that means off of ramp
-	int shuntDist=500;// How much to push the container after it's sensed
-	int speedReductionFactor = 3; // What factor to reduce speed by when slowing, for dock
+	//int offRampDist=-12799;// Distance that means off of ramp
+	//int shuntDist=500;// How much to push the container after it's sensed
+	//int speedReductionFactor = 3; // What factor to reduce speed by when slowing, for dock
 	int speedMinimum = 10; // Minium speed for slow speed
 
 	// OTHER VARIABLES
@@ -70,7 +75,7 @@ int walldis
 			if (debug)writeDebugStreamLine("off the ramp");
 
 			// APPROACHING GOAL SLOWDOWN
-			if ( sonarF < dropdis+5 && !speedSlowed){
+			if ( sonarF < slowDownDis && !speedSlowed && slowDownDis>-1){ // Checking if it needs to slow down -- if the user has specified
 				//to slow goal docking
 				if (debug) writeDebugStreamLine("SLOW DOWN BY FACTOR %d SINCE NEAR GOAL, Front distance = %d cm" , speedReductionFactor , sonarF );
 				speedsgn = sgn( speed );
@@ -78,6 +83,27 @@ int walldis
 				// Check to make sure speed reduction isn't too low - must keep robot moving
 				if( abs(speed) < abs(speedMinimum) ) speed = speedsgn * speedMinimum;
 				speedSlowed=true;
+			}
+
+			if (sonarF<dropdis){
+				if (debug) writeDebugStreamLine("VERY NEAR GOAL, Front distance = %d cm" , sonarF );
+				if (debug) writeDebugStreamLine("MOVE FORWARD FOR A LITTLE LONGER" );
+				motorSide(left, speed);
+				motorSide(right, speed);
+
+				wheelEncoderBeginning=nMotorEncoder[firstLeftMotor];
+
+				if (shuntDist>-1){
+					if (debug)writeDebugStreamLine("SHUNTING");
+					while (abs(nMotorEncoder[firstLeftMotor])-abs(wheelEncoderBeginning)<shuntDist){
+
+					}
+					if (debug)writeDebugStreamLine("FINISHED SHUNTING");
+					motorSide(left, 0);
+					motorSide(right, 0);
+				}
+				if (debug) writeDebugStreamLine("STOPPED MOVING, Front distance = %d cm" , sonarF );
+				break;
 			}
 		}
 
@@ -88,25 +114,6 @@ int walldis
 			nxtDisplayCenteredTextLine(4,"MotR: %3d",nMotorEncoder[firstRightMotor]);
 			nxtDisplayCenteredTextLine(5,"SonF: %3d cm",sonarF);
 			nxtDisplayCenteredTextLine(6,"SonR: %3d cm",sonarR);
-		}
-
-		if (sonarF<dropdis){
-			if (debug) writeDebugStreamLine("VERY NEAR GOAL, Front distance = %d cm" , sonarF );
-			if (debug) writeDebugStreamLine("MOVE FORWARD FOR A LITTLE LONGER" );
-			motorSide(left, speed);
-			motorSide(right, speed);
-
-			wheelEncoderBeginning=nMotorEncoder[firstLeftMotor];
-			if (debug)writeDebugStreamLine("SHUNTING");
-			while (abs(nMotorEncoder[firstLeftMotor])-abs(wheelEncoderBeginning)<shuntDist){
-
-			}
-			if (debug)writeDebugStreamLine("FINISHED SHUNTING");
-			motorSide(left, 0);
-			motorSide(right, 0);
-
-			if (debug) writeDebugStreamLine("STOP MOVING, Front distance = %d cm" , sonarF );
-			break;
 		}
 
 		if ( sonarR>25 || abs(sonarR-walldis)<3 ){//deadband or if it cant see the wall (also deadbanded)
