@@ -20,7 +20,6 @@
 
 //141227 - TELEOP WITH SERVO (DEBUG PRINT CAN BE ENABLED BY THE VARIBLE "debug")
 //Timers used: T1 door - auto spinner,
-//NOTES FOR NEXT TIME: MAKE A DEAD BAND FOR BOTTOM VALUE <-- also add a push stop (button)
 
 #include "JoystickDriver.c"
 #include "Transfer2.0.c"
