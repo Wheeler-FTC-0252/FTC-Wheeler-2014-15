@@ -22,14 +22,14 @@
  *
  * License: You may use this code as you wish, provided you give credit where it's due.
  *
- * THIS CODE WILL ONLY WORK WITH ROBOTC VERSION 3.59 AND HIGHER. 
+ * THIS CODE WILL ONLY WORK WITH ROBOTC VERSION 3.59 AND HIGHER.
 
  * Xander Soldaat (xander_at_botbench.com)
  * 20 February 2011
  * version 0.5
  */
 
-#include "drivers/hitechnic-accelerometer.h"
+#include "hitechnic-accelerometer.h"
 
 task main () {
   int _x_axis = 0;
