@@ -17,10 +17,11 @@ void init(){
 task main()
 {
 	int accelOffSet = 20;
-	int speed = 50;
-	int samplePeriod = 300;//msc
-	int bigPushVal = 10;
-	float fastGain=2;
+	int speed = 30;
+	int samplePeriod = 300;//msec
+	int bigPushVal = 40;
+	int speedDeadband=50;
+	float fastGain=4;
 	float normalGain=1;
 	float gain=normalGain;
 	float delta;
@@ -35,7 +36,7 @@ task main()
 
 	init();
 	ClearTimer(T1);
-	wait1Msc(samplePeriod+5);
+	wait1Msec(samplePeriod+5);
 	while (true){
 		HTACreadAllAxes(accel, x, y, z);
 		delta = (x+accelOffSet);
@@ -46,10 +47,12 @@ task main()
 			ClearTimer(T1);
 			secondAcc=x;
 
-			if (secondAcc-firstAcc>bigPushVal){
+			if (secondAcc-firstAcc>bigPushVal && abs(x)>speedDeadband){
 				gain=fastGain;
+				nxtDisplayCenteredTextLine(7,"SPEED");
 			}
 			else{
+				nxtDisplayCenteredTextLine(7,"SLOW");
 				gain=normalGain;
 			}
 			firstAcc=x;
@@ -61,8 +64,9 @@ task main()
 		delta = (delta+500 % 1000)-500;
 		delta = delta/100.;*/
 		nxtDisplayCenteredTextLine(2,"delta: %f",delta);
-		nxtDisplayCenteredTextLine(5,"motorOutput %d",motorOutput);
+		nxtDisplayCenteredTextLine(5,"motorOutput: %d",motorOutput);
+		nxtDisplayCenteredTextLine(6,"value: %d",x);
 
-		motor[left] = round(speed*delta);
+		motor[left] = round(speed*delta*gain);
 	}
 }
