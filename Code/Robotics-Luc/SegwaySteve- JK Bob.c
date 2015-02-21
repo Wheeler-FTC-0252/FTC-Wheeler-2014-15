@@ -17,7 +17,7 @@ void init(){
 task main()
 {
 	int accelOffSet = 20;
-	int speed = 30;
+	int multiplyer = 8;
 	int samplePeriod = 300;//msec
 	int bigPushVal = 40;
 	int speedDeadband=50;
@@ -38,11 +38,13 @@ task main()
 	ClearTimer(T1);
 	wait1Msec(samplePeriod+5);
 	while (true){
+		wait1Msec(1);//keep the program from slowing down from so many loops
 		HTACreadAllAxes(accel, x, y, z);
 		delta = (x+accelOffSet);
-		delta = delta/20.;
-		motorOutput = round(speed*delta);
+		//delta = delta/20.;
+		motorOutput = round(multiplyer*delta);
 
+		/*
 		if (time1[T1]>samplePeriod){
 			ClearTimer(T1);
 			secondAcc=x;
@@ -56,7 +58,7 @@ task main()
 				gain=normalGain;
 			}
 			firstAcc=x;
-		}
+		}*/
 
 		/*
 		delta = (SensorValue[accel]);
@@ -67,6 +69,6 @@ task main()
 		nxtDisplayCenteredTextLine(5,"motorOutput: %d",motorOutput);
 		nxtDisplayCenteredTextLine(6,"value: %d",x);
 
-		motor[left] = round(speed*delta*gain);
+		motor[left] = round(multiplyer*delta*gain);
 	}
 }
