@@ -16,59 +16,30 @@ void init(){
 
 task main()
 {
-	int accelOffSet = 20;
-	int multiplyer = 8;
-	int samplePeriod = 300;//msec
-	int bigPushVal = 40;
-	int speedDeadband=50;
-	float fastGain=4;
-	float normalGain=1;
-	float gain=normalGain;
+	int accelOffSet = 40;
+	int multiplyer = 100;
 	float delta;
 	int x;
 	int y;
 	int z;
 	int motorOutput;
-
-	HTACreadAllAxes(accel, x, y, z);
-	int firstAcc=x;
-	int secondAcc=x;
-
 	init();
-	ClearTimer(T1);
-	wait1Msec(samplePeriod+5);
+	// ClearTimer(T1);
+
+
 	while (true){
-		wait1Msec(1);//keep the program from slowing down from so many loops
+		//wait1Msec(1);
 		HTACreadAllAxes(accel, x, y, z);
 		delta = (x+accelOffSet);
-		//delta = delta/20.;
 		motorOutput = round(multiplyer*delta);
 
-		/*
-		if (time1[T1]>samplePeriod){
-			ClearTimer(T1);
-			secondAcc=x;
-
-			if (secondAcc-firstAcc>bigPushVal && abs(x)>speedDeadband){
-				gain=fastGain;
-				nxtDisplayCenteredTextLine(7,"SPEED");
-			}
-			else{
-				nxtDisplayCenteredTextLine(7,"SLOW");
-				gain=normalGain;
-			}
-			firstAcc=x;
-		}*/
-
-		/*
-		delta = (SensorValue[accel]);
-		nxtDisplayCenteredBigTextLine(5,"%d",delta);
-		delta = (delta+500 % 1000)-500;
-		delta = delta/100.;*/
+		if(0){
 		nxtDisplayCenteredTextLine(2,"delta: %f",delta);
 		nxtDisplayCenteredTextLine(5,"motorOutput: %d",motorOutput);
 		nxtDisplayCenteredTextLine(6,"value: %d",x);
+		}
 
-		motor[left] = round(multiplyer*delta*gain);
+		motor[left] = round(multiplyer*delta);
 	}
-}
+
+	}
