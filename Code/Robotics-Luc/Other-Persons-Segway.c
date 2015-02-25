@@ -28,7 +28,7 @@ float gyro_rate = 0; // Angular velocity
 float gyro_offset = 0; // Initial offset
 
 /* misc */
-const float wheel_radius = 0.021; // Meaning of life
+const float wheel_radius = 0.03; // Meaning of life
 
 /* Motor */
 float y_ref = 0; // Reference point we want to achieve

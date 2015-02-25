@@ -5,12 +5,19 @@
 
 task main()
 {
-  int x;
-  int y;
-  int z;
-  int advanced=true;
-  while (true){
-    int sensorVal=SensorValue[gyro];
-    nxtDisplayCenteredBigTextLine(3,"%d", sensorVal);
-  }
+	int sensorVal;
+	int average=0;
+	int loopTimes = 0;
+	int loopMax = 100;
+	while (true){
+		loopTimes = 0;
+		average=0;
+		while ( loopTimes++ < loopMax ){
+			sensorVal=SensorValue[gyro];
+			average=average+sensorVal;
+		}
+
+		nxtDisplayCenteredBigTextLine(6,"%d", (average/loopTimes));
+		// nxtDisplayCenteredBigTextLine(3,"%d", sensorVal);
+	}
 }
