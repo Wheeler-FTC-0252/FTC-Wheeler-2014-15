@@ -141,8 +141,8 @@ task main()
 
 		//gunner's control buttons
 		doorbutton=1;
-		spinnerIn=2;
-		spinnerOut=4;
+		spinnerIn=4;
+		spinnerOut=2;
 		speedButtonArm=32;
 		//autoSpinnerButton=32;
 

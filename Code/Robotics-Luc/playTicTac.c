@@ -1,6 +1,8 @@
 task main()
 {
-	PlaySoundFile("ticTac.rso");
-	while (bSoundActive){
+	while (true){
+		PlaySoundFile("ticTac.rso");
+		while (bSoundActive){
+		}
 	}
 }

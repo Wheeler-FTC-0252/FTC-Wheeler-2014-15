@@ -1,5 +1,8 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Motor,  motorA,          liftA,         tmotorNXT, PIDControl, encoder)
+#pragma config(Motor,  motorB,          liftB,         tmotorNXT, PIDControl, encoder)
+#pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     rightF,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     rightB,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     leftF,         tmotorTetrix, openLoop, reversed)
@@ -13,16 +16,35 @@ task main()
 {
 	int joy_1y1;
 	int joy_1y2;
+	int joy_2y1;
+	int joy_2y2;
 	int dband=15;
-
+	int liftLevels[2]={0, 2450};
+	int encoderAverage;
 	while (true){
+		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2;
 		getJoystickSettings(joystick);
 		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, 150./300.);//Driver Joy
 		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, 150./300.);
-
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./128.);//Driver Joy
+		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./128.);
+		//DRIVER//
 		motor[leftF]=joy_1y1;
 		motor[leftB]=joy_1y1;
 		motor[rightF]=joy_1y2;
 		motor[rightB]=joy_1y2;
+
+		//Gunner//
+		if (encoderAverage>liftLevels[0] && encoderAverage<liftLevels[sizeof(array)/sizeof(int)]){
+			// above lowest level and below highest level
+			motor[liftA]=joy_2y1;
+			motor[liftB]=joy_2y1;
+		}
+		else{
+			motor[liftA]=0;
+			motor[liftB]=0;
+		}
+
+		//if (nMotorEncoder[motor1]liftLevels[0])
 	}
 }
