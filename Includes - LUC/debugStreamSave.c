@@ -14,11 +14,11 @@ TFileHandle saveFileInit(){//run this at the beginning before using the function
 	short searchFileSize;
 	string searchName;
 
-	while (!fileNameFound){
+	while (fileNameFound){
 		fileEnding++;
 		searchName = fileBeginning;
 		searchName += fileMiddle;
-		searchName += fileEnding;
+		searchName += (string)fileEnding;
 		searchName += fileExtention;
 
 		FindFirstFile(searchHandle, searchResult, searchName,  searchReturnName, searchFileSize);

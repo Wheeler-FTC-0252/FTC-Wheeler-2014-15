@@ -1,11 +1,15 @@
 task main()
 {
 	string fileBeginning="debug-";
-	string fileMiddle= (string)__DATE__ + (string)__TIME__ + "-";
-	string fileEnding=0;
+	string date = __DATE__;
+	string time = __TIME__;
+	string fileMiddle= date + time;
+	fileMiddle += "-";
+	string fileEnding="0";
 	string fileExtention=".txt"
 
-	string searchName = (string)fileBeginning + (string)fileMiddle + (string)fileEnding + (string)fileExtention;
+	string searchName = (string)fileBeginning + (string)fileMiddle;
+	searchName += (string)fileEnding + (string)fileExtention;
 
 	TFileHandle searchHandle;
 	TFileIOResult searchResult;
@@ -14,6 +18,10 @@ task main()
 
 	FindFirstFile(searchHandle, searchResult, searchName,  searchReturnName, searchFileSize);
 
-	nxtDisplayCenteredTextLine(3,"%d",searchName);
+/*	nxtDisplayCenteredTextLine(1,"fM: %s",fileMiddle);
+	nxtDisplayCenteredTextLine(3,"time: %s",time);
+	nxtDisplayCenteredTextLine(5,"date: %s",date);
+	nxtDisplayCenteredTextLine(7,"sN: %s",searchName);*/
+	nxtDisplayCenteredTextLine(7,"searchResult: %d",searchResult);
 	while (true){}
 }
