@@ -2,5 +2,5 @@
 
 task main()
 {
-	writeDebugStreamLineSave("cheese\n");
+	writeDebugStreamLineSave("cheese");
 }

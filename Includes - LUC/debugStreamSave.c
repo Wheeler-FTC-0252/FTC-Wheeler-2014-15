@@ -1,7 +1,8 @@
 void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
-	word FileSize;
+	short FileSize = 100;
+	//word FileSize;
 	const char * debugSaveFile="debugSave.txt";
 
 	//short stringLength = sizeof(saveText);
