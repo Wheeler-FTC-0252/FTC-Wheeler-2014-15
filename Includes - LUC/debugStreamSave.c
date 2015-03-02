@@ -47,7 +47,7 @@ void writeDebugStreamSaveMain(char * saveText, bool carrageReturn){
 	//short stringLength = sizeof(saveText);
 
 
-	OpenWrite(FileHandle, IoResult, debugSaveFile, FileSize);
+	//OpenWrite(FileHandle, IoResult, debugSaveFile, FileSize);
 
 	if (carrageReturn){//newline
 		WriteString(FileHandle, IoResult, "\n");
@@ -58,7 +58,7 @@ void writeDebugStreamSaveMain(char * saveText, bool carrageReturn){
 	}
 
 	WriteString(FileHandle, IoResult, saveText);
-	Close(FileHandle, IoResult);
+	//Close(FileHandle, IoResult);
 }
 
 void writeDebugStreamLineSave(char * saveText){
