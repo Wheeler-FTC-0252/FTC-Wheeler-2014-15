@@ -1,4 +1,4 @@
-void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
+void writeDebugStreamSaveMain(string saveText, bool carrageReturn){
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
 	short FileSize = 100;
@@ -22,10 +22,10 @@ void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
 	Close(FileHandle, IoResult);
 }
 
-void writeDebugStreamLineSave(const char * saveText){
+void writeDebugStreamLineSave(string saveText){
 	writeDebugStreamSaveMain(saveText, true);
 }
 
-void writeDebugStreamSave(const char * saveText){
+void writeDebugStreamSave(string saveText){
 	writeDebugStreamSaveMain(saveText, false);
 }
