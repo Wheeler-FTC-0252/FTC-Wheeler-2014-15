@@ -2,7 +2,7 @@ void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
 	const char * debugSaveFile="debugSave.txt";
-	short stringLength=sizeof(saveText);
+	short stringLength = sizeof(saveText);
 
 
 	OpenWrite(FileHandle, IoResult, debugSaveFile, stringLength);
@@ -14,6 +14,7 @@ void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
 	else{
 		writeDebugStream(saveText);
 	}
+
 	WriteString(FileHandle, IoResult, saveText);
 	Close(FileHandle, IoResult);
 }
