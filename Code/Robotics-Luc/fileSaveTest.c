@@ -2,5 +2,6 @@
 
 task main()
 {
-	writeDebugStreamLineSave("cheese");
+	TFileHandle handleName = saveFileInit();
+	writeDebugStreamLineSave("cheese", handleName);
 }

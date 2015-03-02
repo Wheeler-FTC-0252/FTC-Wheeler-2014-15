@@ -21,7 +21,7 @@ TFileHandle saveFileInit(){//run this at the beginning before using the function
 		searchName += fileEnding;
 		searchName += fileExtention;
 
-		FindFirstFile(searchHandle, searchResult, searchName,  searchReturnName, searchFileSize) ;
+		FindFirstFile(searchHandle, searchResult, searchName,  searchReturnName, searchFileSize);
 		if (searchResult==0){
 			fileName=searchName;
 			fileNameFound=True;
@@ -37,9 +37,9 @@ TFileHandle saveFileInit(){//run this at the beginning before using the function
 	return FileHandle
 }
 
-void writeDebugStreamSaveMain(char * saveText, bool carrageReturn){
+void writeDebugStreamSaveMain(char * saveText, TFileHandle FileHandle, bool carrageReturn){
 	TFileIOResult IoResult;
-	TFileHandle FileHandle;
+	//TFileHandle FileHandle;
 	short FileSize = 100;
 	//word FileSize;
 	const char * debugSaveFile="debugSave.txt";
@@ -61,10 +61,10 @@ void writeDebugStreamSaveMain(char * saveText, bool carrageReturn){
 	//Close(FileHandle, IoResult);
 }
 
-void writeDebugStreamLineSave(char * saveText){
-	writeDebugStreamSaveMain(saveText, true);
+void writeDebugStreamLineSave(char * saveText, TFileHandle FileHandle){
+	writeDebugStreamSaveMain(saveText, FileHandle, true);
 }
 
-void writeDebugStreamSave(char * saveText){
-	writeDebugStreamSaveMain(saveText, false);
+void writeDebugStreamSave(char * saveText, TFileHandle FileHandle){
+	writeDebugStreamSaveMain(saveText, FileHandle, false);
 }
