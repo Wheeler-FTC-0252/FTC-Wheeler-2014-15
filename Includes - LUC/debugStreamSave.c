@@ -1,11 +1,13 @@
 void writeDebugStreamSaveMain(const char * saveText, bool carrageReturn){
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
+	word FileSize;
 	const char * debugSaveFile="debugSave.txt";
-	short stringLength = sizeof(saveText);
+
+	//short stringLength = sizeof(saveText);
 
 
-	OpenWrite(FileHandle, IoResult, debugSaveFile, stringLength);
+	OpenWrite(FileHandle, IoResult, debugSaveFile, FileSize);
 
 	if (carrageReturn){//newline
 		WriteString(FileHandle, IoResult, "\n");
