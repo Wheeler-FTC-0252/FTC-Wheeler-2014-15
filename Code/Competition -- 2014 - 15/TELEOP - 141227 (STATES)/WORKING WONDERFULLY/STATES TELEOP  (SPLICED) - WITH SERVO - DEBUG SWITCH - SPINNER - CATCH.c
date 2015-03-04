@@ -112,7 +112,7 @@ task main()
 	int spinnerOut;
 	int speedButtonArm;
 	int autoSpinnerButton=32;
-	bool autoSpinner=true;// change back to false
+	bool autoSpinner=false;// change back to false
 	int spinnerSpeedOut=0;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD) -- spin1 leads
 	int spinnerSpeedIn=255;
 	int catchDownPos=0;//change in future
