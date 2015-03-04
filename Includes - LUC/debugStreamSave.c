@@ -1,12 +1,18 @@
+
 TFileHandle saveFileInit(){//run this at the beginning before using the functions below
-	bool fileNameFound=False;
+
+	bool fileNameFound=false;
+
 	string fileName;
-	string fileBeginning="debug-";
-	string fileMiddle=__DATE__;
-	fileMiddle += __TIME__;
-	fileMiddle += "-"
-	string fileEnding=0;
-	string fileExtention=".txt"
+	string fileBeginning="d";
+	string time ;
+	sprintf( time , "%03d" , nClockMinutes);
+	string date = "150302";
+	string fileMiddle = date + "-";
+	fileMiddle += time;
+	int fileEnding= rand() % 1000  ;
+	string fileEndingString;
+	string fileExtention=".txt";
 
 	TFileHandle searchHandle;
 	TFileIOResult searchResult;
@@ -14,27 +20,36 @@ TFileHandle saveFileInit(){//run this at the beginning before using the function
 	short searchFileSize;
 	string searchName;
 
-	while (fileNameFound){
-		fileEnding++;
-		searchName = fileBeginning;
-		searchName += fileMiddle;
-		searchName += (string)fileEnding;
-		searchName += fileExtention;
+	while (!fileNameFound){
+		string searchName = (string)fileBeginning + (string)fileMiddle;
+		sprintf(fileEndingString , "%03d",fileEnding);
+		searchName += fileEndingString;
+		searchName += (string)fileExtention;
 
 		FindFirstFile(searchHandle, searchResult, searchName,  searchReturnName, searchFileSize);
-		if (searchResult==0){
+		if (searchResult!=0){
 			fileName=searchName;
 			fileNameFound=True;
 		}
+		else
+				fileEnding++;
 	}
+
+//	fileName = "bollox.txt";
 
 
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
-	short FileSize = 100;
+	short FileSize = 1000;
 
+	if(debugFlag){writeDebugStreamLine( "Write to Filename: %s" , fileName );}
 	OpenWrite(FileHandle, IoResult, fileName, FileSize);
-	return FileHandle
+	// nIoResult is non-zero when an error occurs.
+	if(debugFlag){writeDebugStreamLine( "OpenWrite IoResult: %d" , IoResult );}
+	if(debugFlag){writeDebugStreamLine( "OpenWrite FileHandle: %d" , FileHandle );}
+	//nxtDisplayBigTextLine(3, "%d", IoResult);
+	//while(true){}
+	return FileHandle;
 }
 
 void writeDebugStreamSaveMain(char * saveText, TFileHandle FileHandle, bool carrageReturn){
@@ -42,22 +57,31 @@ void writeDebugStreamSaveMain(char * saveText, TFileHandle FileHandle, bool carr
 	//TFileHandle FileHandle;
 	short FileSize = 100;
 	//word FileSize;
-	const char * debugSaveFile="debugSave.txt";
+	//const char * debugSaveFile="debugSave.txt";
 
 	//short stringLength = sizeof(saveText);
 
 
 	//OpenWrite(FileHandle, IoResult, debugSaveFile, FileSize);
 
+	if(debugFlag){writeDebugStreamLine( "SAVE MAIN" );}
+
 	if (carrageReturn){//newline
 		WriteString(FileHandle, IoResult, "\n");
+
 		writeDebugStreamLine(saveText);
+		if(debugFlag){
+			writeDebugStreamLine("made a new line");
+		}
 	}
 	else{
 		writeDebugStream(saveText);
 	}
 
 	WriteString(FileHandle, IoResult, saveText);
+	if(debugFlag){
+		writeDebugStreamLine("writing: %s", saveText);
+	}
 	//Close(FileHandle, IoResult);
 }
 

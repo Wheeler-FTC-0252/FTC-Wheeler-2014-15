@@ -1,5 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S2,     ,               sensorI2CHiTechnicCompass)
+#pragma config(Sensor, S2,     comp,           sensorI2CHiTechnicCompass)
 #pragma config(Sensor, S3,     touch,          sensorTouch)
 #pragma config(Motor,  motorA,          unused1,       tmotorNXT, openLoop)
 #pragma config(Motor,  motorB,          unused2,       tmotorNXT, openLoop)

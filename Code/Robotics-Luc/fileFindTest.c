@@ -1,10 +1,12 @@
+//#include "time.h"
+
 task main()
 {
 	string fileBeginning="debug-";
 	string date = __DATE__;
 	string time = __TIME__;
-	string fileMiddle= date + time;
-	fileMiddle += "-";
+	//string fileMiddle= date + "-"
+	string fileMiddle = time + "-";
 	string fileEnding="0";
 	string fileExtention=".txt"
 
@@ -18,10 +20,14 @@ task main()
 
 	FindFirstFile(searchHandle, searchResult, searchName,  searchReturnName, searchFileSize);
 
-/*	nxtDisplayCenteredTextLine(1,"fM: %s",fileMiddle);
-	nxtDisplayCenteredTextLine(3,"time: %s",time);
-	nxtDisplayCenteredTextLine(5,"date: %s",date);
-	nxtDisplayCenteredTextLine(7,"sN: %s",searchName);*/
-	nxtDisplayCenteredTextLine(7,"searchResult: %d",searchResult);
+	if (true){
+		nxtDisplayCenteredTextLine(1,"%s",fileMiddle);
+		nxtDisplayCenteredTextLine(3,"time: %s",time);
+		nxtDisplayCenteredTextLine(5,"date: %s",date);
+		nxtDisplayCenteredTextLine(7,"sN: %s",searchName);
+	}
+	else{
+		nxtDisplayCenteredTextLine(7,"searchResult: %d",searchResult);
+	}
 	while (true){}
 }
