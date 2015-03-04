@@ -111,8 +111,8 @@ task main()
 	int spinnerIn;
 	int spinnerOut;
 	int speedButtonArm;
-//	int autoSpinnerButton=32;
-	bool autoSpinner=false;
+	int autoSpinnerButton=32;
+	bool autoSpinner=true;// change back to false
 	int spinnerSpeedOut=0;//0-126 BACKWARDS (0 IS FULL BACK), 127 STILL, 128-255 FORWARD (255 IS FULL FORWARD) -- spin1 leads
 	int spinnerSpeedIn=255;
 	int catchDownPos=0;//change in future
@@ -144,7 +144,7 @@ task main()
 		spinnerIn=4;
 		spinnerOut=2;
 		speedButtonArm=32;
-		//autoSpinnerButton=32;
+		autoSpinnerButton=32;
 
 	}
 
@@ -303,7 +303,7 @@ task main()
 				servo[spin1]=spinnerSpeedIn;//in
 				servo[spin2]=spinnerSpeedOut;
 			}
-			else if (movement==2 || movement==0){//up or stopped (stopped but is above joylevels[1])
+			else if (nMotorEncoder[arm]>joylevels[1] && (movement==2 || movement==0)){//up or stopped (stopped but is above joylevels[1])
 				servo[spin1]=spinnerSpeedOut;//out because spin1 leads
 				servo[spin2]=spinnerSpeedIn;
 			}
