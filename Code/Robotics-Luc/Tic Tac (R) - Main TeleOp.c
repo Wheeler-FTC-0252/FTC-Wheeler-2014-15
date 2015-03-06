@@ -23,12 +23,38 @@ task main()
 	int liftLevels[2]={0, 2450};
 	int encoderAverage;
 	int armMovement=0;//0 = stopped, 1 = down, 2 = up
+	float armGainSlow = 0.25;
+	float armGainFast = 2.;
+	float armGain = armGainFast;
+	float driveGainSlow = 0.5;
+	float driveGainFast = 1.;
+	float driveGain = driveGainFast;
+	int joyButtons1;
+	int joyButtons2;
+	int gainButton = 32;
 	while (true){
+		joyButtons1=joystick.joy1_Buttons;
+		joyButtons2=joystick.joy2_Buttons;
+
+		if (joyButtons1==gainButton){	//drive gain
+			driveGain = driveGainSlow;
+		}
+		else{
+			driveGain = driveGainFast;
+		}
+
+		if (joyButtons2==gainButton){	//arm gain
+			armGain = armGainSlow;
+			writeDebugStreamLine("arm slow");
+		}
+		else{
+			armGain = armGainFast;
+		}
 		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2;
 		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, 150./300.);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, 150./300.);
-		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./128.);//Gunner Joy - Arm
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, driveGain * 150./300.);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, driveGain * 150./300.);
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, armGain * 100./128.);//Gunner Joy - Arm
 		//joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./128.);
 		//DRIVER//
 		motor[leftF]=joy_1y1;
