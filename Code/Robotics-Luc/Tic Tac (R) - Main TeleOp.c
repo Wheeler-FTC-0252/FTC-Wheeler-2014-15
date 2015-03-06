@@ -14,37 +14,51 @@
 
 task main()
 {
+	nMotorEncoder[liftA]=0;
+	nMotorEncoder[liftB]=0;
 	int joy_1y1;
 	int joy_1y2;
 	int joy_2y1;
-	int joy_2y2;
 	int dband=15;
 	int liftLevels[2]={0, 2450};
 	int encoderAverage;
+	int armMovement=0;//0 = stopped, 1 = down, 2 = up
 	while (true){
 		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2;
 		getJoystickSettings(joystick);
 		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, 150./300.);//Driver Joy
 		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, 150./300.);
-		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./128.);//Driver Joy
-		joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./128.);
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, 100./128.);//Gunner Joy - Arm
+		//joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./128.);
 		//DRIVER//
 		motor[leftF]=joy_1y1;
 		motor[leftB]=joy_1y1;
 		motor[rightF]=joy_1y2;
 		motor[rightB]=joy_1y2;
 
+		if (joy_2y1>0){//arm move up
+			armMovement = 2;
+		}
+		else if (joy_2y1<0){//arm move down
+			armMovement = 1;
+		}
+		else{//arm stopped
+			armMovement = 0;
+		}
+
 		//Gunner//
-		if (encoderAverage>liftLevels[0] && encoderAverage<liftLevels[sizeof(array)/sizeof(int)]){
+		if (
+			(encoderAverage<liftLevels[0] && armMovement == 1)// below lowest and going down
+			|| (encoderAverage>liftLevels[sizeof(liftLevels)/sizeof(int)-1] && armMovement == 2) //above highest and going up
+			|| armMovement == 0)//not moving
+		{
+				motor[liftA]=0;
+				motor[liftB]=0;
+		}
+		else{
 			// above lowest level and below highest level
 			motor[liftA]=joy_2y1;
 			motor[liftB]=joy_2y1;
 		}
-		else{
-			motor[liftA]=0;
-			motor[liftB]=0;
-		}
-
-		//if (nMotorEncoder[motor1]liftLevels[0])
 	}
 }
