@@ -16,8 +16,11 @@
 //USER DEFINED//
 float timeWait=0.01; //seconds, 10 ms / 100 Hz looping - was taking t
 float gyroMix=0.98; // Fraction of gyroRate-based integrated data versus Accelerometer Angle data used for absolute angle
-int gain=100; // Motor gain based on angle
+int pGain = 25; // gain for the "P" factor
+int iGain = 25; // gain for the "I" factor
+int dGain = 25; // gain for the "D" factor
 int offsetLoopNumber=100; // Number of measurements to get average gyro value for no rotation
+int integDecay = 500; // how many loops after a value is added is 30% of the origional - "I"
 
 task main()
 {
@@ -33,7 +36,8 @@ task main()
 	float gyroRateValue; // gyro rate degrees/second
 	float gyroRateOffset = 0.;
 	int motorOutput;
-
+	float integration = 0;
+	float differential;
 	playSound(soundDownwardTones);
 	nxtDisplayCenteredTextLine(3,"PLACE THE SEGWAY ON THE FLOOR!");
 	wait1Msec(2000);
@@ -60,18 +64,23 @@ task main()
 		// Time for loop control
 		clearTimer(T1);
 
-
 		gyroRateValue = (float)SensorValue[gyro] - gyroRateOffset; // Read the GYRO
 		HTACreadAllAxes(accel, x, y, z); // Read the ACCELEROMETER
 
+		//---- Sensor Readings and "P"----
 		// ACCELEROMETER estimated - low sensitivity, but maintains absolute calibration without drift
 		accelAngle = 180./PI * (-1*atan2((float)x,(float)z)); // Accelerometer angle, includes rad to degrees, +ve angle is leaning forward
 
 		// Gyro absolute angle [degrees] based on integrating gyroRate, mixed with small amount of abslute value from accelerometer
 		gyroAngle = ( gyroMix * (gyroAngle + gyroRateValue*timeWait) ) + ((1.-gyroMix)*accelAngle);
-		// New angle estimate contains majority if
 
-		motorOutput=round( gain * gyroAngle );
+		//---- "I" ----
+		integration = gyroAngle + (float)(integDecay-1)/(float)integDecay*(float)integration;
+
+		//---- "D" ----
+		differential = gyroAngle;
+
+		motorOutput=round( (float)pGain * gyroAngle + (float)iGain * integration + (float)dGain * differential );
 		motor[motorA]=motorOutput;
 
 		// DISPLAY
