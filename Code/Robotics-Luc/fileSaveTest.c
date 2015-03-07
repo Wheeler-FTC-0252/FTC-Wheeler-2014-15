@@ -1,4 +1,4 @@
-bool debugFlag = true;
+//bool debugFlag = true;
 
 #include "debugStreamSave.c"
 
@@ -11,5 +11,6 @@ task main()
 	if(debugFlag){writeDebugStreamLine( "Handle Number: %d" , handleName );}
 	if(debugFlag){writeDebugStreamLine( "WRITE STREAM" );}
 
+	writeDebugStreamLineSave("cheese", handleName);
 	writeDebugStreamLineSave("cheese", handleName);
 }

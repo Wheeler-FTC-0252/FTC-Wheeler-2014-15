@@ -10,15 +10,15 @@
 
 
 #include "hitechnic-accelerometer.h"
-
+#include "debugStreamSave.c"
 
 
 //USER DEFINED//
-float timeWait=0.01; //seconds, 10 ms / 100 Hz looping - was taking t
+float timeWait=0.02; //seconds, 10 ms / 100 Hz looping - was taking t
 float gyroMix=0.98; // Fraction of gyroRate-based integrated data versus Accelerometer Angle data used for absolute angle
 int pGain = 25; // gain for the "P" factor
-int iGain = 25; // gain for the "I" factor
-int dGain = 25; // gain for the "D" factor
+int iGain = 0; // gain for the "I" factor
+int dGain = 0; // gain for the "D" factor
 int offsetLoopNumber=100; // Number of measurements to get average gyro value for no rotation
 int integDecay = 500; // how many loops after a value is added is 30% of the origional - "I"
 
@@ -38,6 +38,9 @@ task main()
 	int motorOutput;
 	float integration = 0;
 	float differential;
+	char writeStringValue[200];
+	TFileHandle debugHandle = saveFileInit();
+
 	playSound(soundDownwardTones);
 	nxtDisplayCenteredTextLine(3,"PLACE THE SEGWAY ON THE FLOOR!");
 	wait1Msec(2000);
@@ -78,10 +81,24 @@ task main()
 		integration = gyroAngle + (float)(integDecay-1)/(float)integDecay*(float)integration;
 
 		//---- "D" ----
-		differential = gyroAngle;
+		differential = gyroRateValue;
 
 		motorOutput=round( (float)pGain * gyroAngle + (float)iGain * integration + (float)dGain * differential );
+		if (abs(motorOutput)>100){//stop it from going over 100
+			motorOutput=100;
+		}
 		motor[motorA]=motorOutput;
+
+//		sprintf(writeStringValue, "pgmTime: %d, accelAngle: %f, gyroAngle: %f, integration: %f, differential: %d, motorOutput: %d"
+		sprintf(writeStringValue, "%6d,%7.3f,%7.3f,%8.3f,%4d,%4d"
+		, nPgmTime
+		, accelAngle
+		, gyroAngle
+		, integration
+		, differential
+		, motorOutput);
+
+		writeDebugStreamLineSave( writeStringValue, debugHandle );
 
 		// DISPLAY
 		if( loopCount%100 == 0) 			// Display values every n'th loops
@@ -90,7 +107,7 @@ task main()
 			nxtDisplayCenteredTextLine(1,"GYRO: %6.1f",gyroAngle);
 			//nxtDisplayCenteredTextLine(3,"x: %d, z: %d",x,z);
 			nxtDisplayCenteredTextLine(3,"loop: %d", loopCount);
-			nxtDisplayCenteredTextLine(5,"ACCEL: %6.1f",accelAngle);
+			nxtDisplayCenteredTextLine(5,"diff: %d",differential);
 			nxtDisplayCenteredTextLine(7,"motorOutput: %d",motorOutput);
 		}
 

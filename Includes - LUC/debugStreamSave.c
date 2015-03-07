@@ -1,3 +1,4 @@
+bool debugFlag = false;
 
 TFileHandle saveFileInit(){//run this at the beginning before using the functions below
 
@@ -7,7 +8,7 @@ TFileHandle saveFileInit(){//run this at the beginning before using the function
 	string fileBeginning="d";
 	string time ;
 	sprintf( time , "%03d" , nClockMinutes);
-	string date = "150302";
+	string date = "150307";
 	string fileMiddle = date + "-";
 	fileMiddle += time;
 	int fileEnding= rand() % 1000  ;
@@ -40,7 +41,7 @@ TFileHandle saveFileInit(){//run this at the beginning before using the function
 
 	TFileIOResult IoResult;
 	TFileHandle FileHandle;
-	short FileSize = 1000;
+	short FileSize = 1000000;
 
 	if(debugFlag){writeDebugStreamLine( "Write to Filename: %s" , fileName );}
 	OpenWrite(FileHandle, IoResult, fileName, FileSize);
@@ -66,19 +67,19 @@ void writeDebugStreamSaveMain(char * saveText, TFileHandle FileHandle, bool carr
 
 	if(debugFlag){writeDebugStreamLine( "SAVE MAIN" );}
 
+	WriteText(FileHandle, IoResult, saveText);
 	if (carrageReturn){//newline
-		WriteString(FileHandle, IoResult, "\n");
+		WriteText(FileHandle, IoResult, "\n");
 
-		writeDebugStreamLine(saveText);
+		//writeDebugStreamLine(saveText);
 		if(debugFlag){
 			writeDebugStreamLine("made a new line");
 		}
 	}
 	else{
-		writeDebugStream(saveText);
+		//writeDebugStream(saveText);
 	}
 
-	WriteString(FileHandle, IoResult, saveText);
 	if(debugFlag){
 		writeDebugStreamLine("writing: %s", saveText);
 	}
