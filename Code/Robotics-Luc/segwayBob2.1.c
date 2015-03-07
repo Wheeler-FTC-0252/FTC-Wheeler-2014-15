@@ -16,7 +16,7 @@
 //USER DEFINED//
 float timeWait=0.02; //seconds, 10 ms / 100 Hz looping - was taking t
 float gyroMix=0.98; // Fraction of gyroRate-based integrated data versus Accelerometer Angle data used for absolute angle
-int pGain = 25; // gain for the "P" factor
+int pGain = 10; // gain for the "P" factor
 int iGain = 0; // gain for the "I" factor
 int dGain = 0; // gain for the "D" factor
 int offsetLoopNumber=100; // Number of measurements to get average gyro value for no rotation
@@ -114,7 +114,7 @@ task main()
 		// LOOP CONTROL
 		loopCount++;
 
-		while(time1[T1]<timeWait/2*1000){}
+		while(time1[T1]<timeWait*1000.){} //2*1000){}
 		//wait1Msec(timeWait/2*1000); // Wait before looping again - need to manually adjust
 	}
 }
