@@ -11,56 +11,91 @@
 
 #include "Transfer2.0.c"
 #include "JoystickDriver.c"
-
+#define properJoysticks 1
 task main()
 {
 	nMotorEncoder[liftA]=0;
 	nMotorEncoder[liftB]=0;
-	int joy_1y1;
-	int joy_1y2;
-	int joy_2y1;
+	float joy_1y1;
+	float joy_2y1;
+	float joy_1x2;
+	float joy_2x2;
 	int dband=15;
 	int liftLevels[2]={0, 2450};
 	int encoderAverage;
 	int armMovement=0;//0 = stopped, 1 = down, 2 = up
-	float armGainSlow = 0.25;
-	float armGainFast = 2.;
-	float armGain = armGainFast;
-	float driveGainSlow = 0.5;
-	float driveGainFast = 1.;
-	float driveGain = driveGainFast;
 	int joyButtons1;
 	int joyButtons2;
-	int gainButton = 32;
+	int armSpeed;
+	int driveSpeedLeft;
+	int driveSpeedRight;
+
+	#if properJoysticks == 1
+		int liftUpButton = 1;
+		int liftDownButton = 1;
+	#else
+		float armGainSlow = 0.25;
+		float armGainFast = 2.;
+		float armGain = armGainFast;
+		float driveGainSlow = 0.5;
+		float driveGainFast = 1.;
+		float driveGain = driveGainFast;
+		int gainButton = 32;
+	#endif
+	//
+
 	while (true){
+		getJoystickSettings(joystick);
 		joyButtons1=joystick.joy1_Buttons;
 		joyButtons2=joystick.joy2_Buttons;
 
-		if (joyButtons1==gainButton){	//drive gain
-			driveGain = driveGainSlow;
-		}
-		else{
-			driveGain = driveGainFast;
-		}
+		#if properJoysticks == 1
+			joy_1x2 = (float)((joystick.joy1_x2*-1)+128) * 2./256.; // Drive Speed Multiplyer
+			joy_2x2 = (float)((joystick.joy2_x2*-1)+128) * 100./256.; // Arm Speed
+			joy_1y1 = transfer_J_To_M(joystick.joy1_y1, dband, joy_1x2); // Driver Right
+			joy_2y1 = transfer_J_To_M(joystick.joy2_y1, dband, joy_1x2); // Driver Left
 
-		if (joyButtons2==gainButton){	//arm gain
-			armGain = armGainSlow;
-			writeDebugStreamLine("arm slow");
-		}
-		else{
-			armGain = armGainFast;
-		}
-		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2;
-		getJoystickSettings(joystick);
-		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, driveGain * 150./300.);//Driver Joy
-		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, driveGain * 150./300.);
-		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, armGain * 100./128.);//Gunner Joy - Arm
+			if (joyButtons2 == liftUpButton){
+				armSpeed = round(joy_2x2);
+			}
+			else if (joyButtons1 == liftDownButton){
+				armSpeed = round(joy_2x2 * -1);
+			}
+
+			driveSpeedLeft = round(joy_1y1);
+			driveSpeedRight = round(joy_2y1);
+		#else
+			if (joyButtons1==gainButton){	//drive gain
+				driveGain = driveGainSlow;
+			}
+			else{
+				driveGain = driveGainFast;
+			}
+
+			if (joyButtons2==gainButton){	//arm gain
+				armGain = armGainSlow;
+				writeDebugStreamLine("arm slow");
+			}
+			else{
+				armGain = armGainFast;
+			}
+			joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, driveGain * 150./300.);//Driver Joy
+			joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, driveGain * 150./300.);
+			joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, armGain * 100./128.);//Gunner Joy - Arm
+			driveSpeedLeft = joy_1y1;
+			driveSpeedRight = joy_1y2;
+			armSpeed = joy_2y1;
+		#endif
+
+		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2; // arm encoder average between both motors
+
+
 		//joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./128.);
 		//DRIVER//
-		motor[leftF]=joy_1y1;
-		motor[leftB]=joy_1y1;
-		motor[rightF]=joy_1y2;
-		motor[rightB]=joy_1y2;
+		motor[leftF]=driveSpeedLeft;
+		motor[leftB]=driveSpeedLeft;
+		motor[rightF]=driveSpeedRight;
+		motor[rightB]=driveSpeedRight;
 
 		if (joy_2y1>0){//arm move up
 			armMovement = 2;
@@ -83,8 +118,8 @@ task main()
 		}
 		else{
 			// above lowest level and below highest level
-			motor[liftA]=joy_2y1;
-			motor[liftB]=joy_2y1;
+			motor[liftA]=armSpeed;
+			motor[liftB]=armSpeed;
 		}
 	}
 }
