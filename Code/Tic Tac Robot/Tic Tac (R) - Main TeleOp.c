@@ -11,7 +11,13 @@
 
 #include "Transfer2.0.c"
 #include "JoystickDriver.c"
-#define properJoysticks 1
+
+#define debug 1
+
+// Comment one out:
+#define properJoysticks 1 // actual joysticks -  Logitech Attack 3
+//#define logitechDualShocks 1 // standard joysticks - Logitech Dual Shocks
+
 task main()
 {
 	nMotorEncoder[liftA]=0;
@@ -30,62 +36,87 @@ task main()
 	int driveSpeedLeft;
 	int driveSpeedRight;
 
-	#if properJoysticks == 1
-		int liftUpButton = 1;
-		int liftDownButton = 1;
-	#else
-		float armGainSlow = 0.25;
-		float armGainFast = 2.;
-		float armGain = armGainFast;
-		float driveGainSlow = 0.5;
-		float driveGainFast = 1.;
-		float driveGain = driveGainFast;
-		int gainButton = 32;
-	#endif
-	//
+#ifdef properJoysticks
+	int liftUpButton = 1;
+	int liftDownButton = 1;
+#elif defined(logitechDualShocks)
+	float armGainSlow = 0.25;
+	float armGainFast = 2.;
+	float armGain = armGainFast;
+	float driveGainSlow = 0.5;
+	float driveGainFast = 1.;
+	float driveGain = driveGainFast;
+	int gainButton = 32;
+#endif
+
 
 	while (true){
 		getJoystickSettings(joystick);
 		joyButtons1=joystick.joy1_Buttons;
 		joyButtons2=joystick.joy2_Buttons;
 
-		#if properJoysticks == 1
-			joy_1x2 = (float)((joystick.joy1_x2*-1)+128) * 2./256.; // Drive Speed Multiplyer
-			joy_2x2 = (float)((joystick.joy2_x2*-1)+128) * 100./256.; // Arm Speed
-			joy_1y1 = transfer_J_To_M(joystick.joy1_y1, dband, joy_1x2); // Driver Right
-			joy_2y1 = transfer_J_To_M(joystick.joy2_y1, dband, joy_1x2); // Driver Left
+#ifdef properJoysticks
+		joy_1x2 = (float)((joystick.joy1_x2*-1)+128) * 2./256.; // Drive Speed Multiplyer
+		joy_2x2 = (float)((joystick.joy2_x2*-1)+128) * 100./256.; // Arm Speed
+		joy_1y1 = transfer_J_To_M(joystick.joy1_y1, dband, joy_1x2); // Driver Right
+		joy_2y1 = transfer_J_To_M(joystick.joy2_y1, dband, joy_1x2); // Driver Left
 
-			if (joyButtons2 == liftUpButton){
-				armSpeed = round(joy_2x2);
-			}
-			else if (joyButtons1 == liftDownButton){
-				armSpeed = round(joy_2x2 * -1);
-			}
+		if (joyButtons2 == liftUpButton){
+			armSpeed = round(joy_2x2);
+			armMovement = 2;
+#if debug
+			writeDebugStreamLine("arm up");
+#endif
+		}
+		else if (joyButtons1 == liftDownButton){
+			armSpeed = round(joy_2x2 * -1);
+			armMovement = 1;
+#if debug
+			writeDebugStreamLine("arm down");
+#endif
+		}
+		else {
+			armMovement = 0;
+			armSpeed = 0;
+		}
 
-			driveSpeedLeft = round(joy_1y1);
-			driveSpeedRight = round(joy_2y1);
-		#else
-			if (joyButtons1==gainButton){	//drive gain
-				driveGain = driveGainSlow;
-			}
-			else{
-				driveGain = driveGainFast;
-			}
+		driveSpeedLeft = round(joy_1y1);
+		driveSpeedRight = round(joy_2y1);
 
-			if (joyButtons2==gainButton){	//arm gain
-				armGain = armGainSlow;
-				writeDebugStreamLine("arm slow");
-			}
-			else{
-				armGain = armGainFast;
-			}
-			joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, driveGain * 150./300.);//Driver Joy
-			joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, driveGain * 150./300.);
-			joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, armGain * 100./128.);//Gunner Joy - Arm
-			driveSpeedLeft = joy_1y1;
-			driveSpeedRight = joy_1y2;
-			armSpeed = joy_2y1;
-		#endif
+#elif defined(logitechDualShocks)
+		if (joyButtons1==gainButton){	//drive gain
+			driveGain = driveGainSlow;
+		}
+		else{
+			driveGain = driveGainFast;
+		}
+
+		if (joyButtons2==gainButton){	//arm gain
+			armGain = armGainSlow;
+#if debug
+			writeDebugStreamLine("arm slow");
+#endif
+		}
+		else{
+			armGain = armGainFast;
+		}
+		joy_1y1=transfer_J_To_M(joystick.joy1_y1, dband, driveGain * 150./300.);//Driver Joy
+		joy_1y2=transfer_J_To_M(joystick.joy1_y2, dband, driveGain * 150./300.);
+		joy_2y1=transfer_J_To_M(joystick.joy2_y1, dband, armGain * 100./128.);//Gunner Joy - Arm
+		driveSpeedLeft = joy_1y1;
+		driveSpeedRight = joy_1y2;
+		armSpeed = joy_2y1;
+
+		if (joy_2y1>0){//arm move up
+			armMovement = 2;
+		}
+		else if (joy_2y1<0){//arm move down
+			armMovement = 1;
+		}
+		else{//arm stopped
+			armMovement = 0;
+		}
+#endif
 
 		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2; // arm encoder average between both motors
 
@@ -97,24 +128,17 @@ task main()
 		motor[rightF]=driveSpeedRight;
 		motor[rightB]=driveSpeedRight;
 
-		if (joy_2y1>0){//arm move up
-			armMovement = 2;
-		}
-		else if (joy_2y1<0){//arm move down
-			armMovement = 1;
-		}
-		else{//arm stopped
-			armMovement = 0;
-		}
-
 		//Gunner//
 		if (
 			(encoderAverage<liftLevels[0] && armMovement == 1)// below lowest and going down
-			|| (encoderAverage>liftLevels[sizeof(liftLevels)/sizeof(int)-1] && armMovement == 2) //above highest and going up
-			|| armMovement == 0)//not moving
+		|| (encoderAverage>liftLevels[sizeof(liftLevels)/sizeof(int)-1] && armMovement == 2) //above highest and going up
+		|| armMovement == 0)//not moving
 		{
-				motor[liftA]=0;
-				motor[liftB]=0;
+			motor[liftA]=0;
+			motor[liftB]=0;
+#if debug
+			writeDebugStreamLine("shouldn't move arm - dead banded or not being used");
+#endif
 		}
 		else{
 			// above lowest level and below highest level
