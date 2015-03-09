@@ -1,3 +1,6 @@
+// 150308 Luc - modified for Martha
+//
+
 /*******INFO*******
 Example #2: Segway-NoAction.c Sample Program for a LEGO NXT Segway
 Author: Laurens Valk (robotsquare.com)
@@ -6,8 +9,8 @@ Full instructions: http://robotsquare.com/2012/02/13/tutorial-segway-with-robotc
 ***************/
 
 /*CHOOSE A SENSOR: Comment out the sensors that you do not have*/
-//#define HiTechnic_Gyro
-#define DexterIndustries_dIMU
+#define HiTechnic_Gyro
+//#define DexterIndustries_dIMU
 //#define MicroInfinity_Cruizcore
 //#define MindSensors_IMU
 
@@ -17,9 +20,9 @@ const float your_wheel_diameter = 42;
 
 /*These are driver files to read gyro sensors. Make sure the path is correct.
   You may delete these three lines if you use the HiTechnic Gyro*/
-#include "drivers/dexterind-imu.h"
-#include "drivers/microinfinity-cruizcore.h"
-#include "drivers/mindsensors-imu.h"
+//#include "drivers/dexterind-imu.h"
+//#include "drivers/microinfinity-cruizcore.h"
+//#include "drivers/mindsensors-imu.h"
 /*This is the Segway Driver code. Place in same directory as this program*/
 #include "segway-driver-lv.h"
 
@@ -31,6 +34,9 @@ task main()
   StartTask(balancing);
   while(starting_balancing_task){}
 
+  while (true){
+  	wait1Msec(60000);
+  }
   /*
   Place your own code here.
 
