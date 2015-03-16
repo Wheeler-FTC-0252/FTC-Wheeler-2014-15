@@ -85,7 +85,7 @@ task main()
 
 		motorOutput=round( (float)pGain * gyroAngle + (float)iGain * integration + (float)dGain * differential );
 		if (abs(motorOutput)>100){//stop it from going over 100
-			motorOutput=100;
+			motorOutput=sgn(motorOutput)*100;
 		}
 		motor[motorA]=motorOutput;
 
