@@ -16,9 +16,9 @@
 //USER DEFINED//
 float timeWait=0.02; //seconds, 10 ms / 100 Hz looping - was taking t
 float gyroMix=0.98; // Fraction of gyroRate-based integrated data versus Accelerometer Angle data used for absolute angle
-int pGain = 10; // gain for the "P" factor
+int pGain = 15; // gain for the "P" factor
 int iGain = 0; // gain for the "I" factor
-int dGain = 0; // gain for the "D" factor
+int dGain = 2; // gain for the "D" factor
 int offsetLoopNumber=100; // Number of measurements to get average gyro value for no rotation
 int integDecay = 500; // how many loops after a value is added is 30% of the origional - "I"
 
