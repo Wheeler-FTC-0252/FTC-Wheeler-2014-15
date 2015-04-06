@@ -14,9 +14,11 @@
 
 #define debug 1
 
-// Comment one out:
+#if 1==0
 #define properJoysticks 1 // actual joysticks -  Logitech Attack 3
-//#define logitechDualShocks 1 // standard joysticks - Logitech Dual Shocks
+#else
+#define logitechDualShocks 1 // standard joysticks - Logitech Dual Shocks
+#endif
 
 task main()
 {
@@ -24,6 +26,7 @@ task main()
 	nMotorEncoder[liftB]=0;
 	float joy_1y1;
 	float joy_2y1;
+	float joy_1y2;
 	float joy_1x2;
 	float joy_2x2;
 	int dband=15;
@@ -51,15 +54,17 @@ task main()
 
 
 	while (true){
+		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2; // arm encoder average between both motors
 		getJoystickSettings(joystick);
 		joyButtons1=joystick.joy1_Buttons;
 		joyButtons2=joystick.joy2_Buttons;
 
-#ifdef properJoysticks
+#if defined(properJoysticks)
 		joy_1x2 = (float)((joystick.joy1_x2*-1)+128) * 2./256.; // Drive Speed Multiplyer
 		joy_2x2 = (float)((joystick.joy2_x2*-1)+128) * 100./256.; // Arm Speed
 		joy_1y1 = transfer_J_To_M(joystick.joy1_y1, dband, joy_1x2); // Driver Right
 		joy_2y1 = transfer_J_To_M(joystick.joy2_y1, dband, joy_1x2); // Driver Left
+
 
 		if (joyButtons2 == liftUpButton){
 			armSpeed = round(joy_2x2);
@@ -118,10 +123,6 @@ task main()
 		}
 #endif
 
-		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2; // arm encoder average between both motors
-
-
-		//joy_2y2=transfer_J_To_M(joystick.joy2_y2, dband, 100./128.);
 		//DRIVER//
 		motor[leftF]=driveSpeedLeft;
 		motor[leftB]=driveSpeedLeft;
