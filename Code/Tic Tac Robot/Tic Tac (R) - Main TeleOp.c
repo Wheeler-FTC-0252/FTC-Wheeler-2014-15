@@ -148,8 +148,7 @@ while (nMotorRunState[dispense]==runStateIdle) {}
 		}
 
 
-
-
+		//Motor Speed Set
 		//DRIVER//
 		motor[leftF]=driveSpeedLeft;
 		motor[leftB]=driveSpeedLeft;
