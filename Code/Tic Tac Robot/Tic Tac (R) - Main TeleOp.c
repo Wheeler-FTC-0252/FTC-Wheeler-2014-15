@@ -2,7 +2,7 @@
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  motorA,          liftA,         tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  motorB,          liftB,         tmotorNXT, PIDControl, encoder)
-#pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
+#pragma config(Motor,  motorC,          dispense,      tmotorNXT, openLoop)
 #pragma config(Motor,  mtr_S1_C1_1,     rightF,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     rightB,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     leftF,         tmotorTetrix, openLoop, reversed)
@@ -38,8 +38,14 @@ task main()
 	int armSpeed;
 	int driveSpeedLeft;
 	int driveSpeedRight;
+	int initDispenseRotate=185;
+	int dispenseRotate=60;
+	int dispenseSpeed=10;
 
+//Controller Type Param Setup
 #ifdef properJoysticks
+	//---Buttons---
+	//int dispenseButton //<- figure out what to set
 	int liftUpButton = 1;
 	int liftDownButton = 1;
 #elif defined(logitechDualShocks)
@@ -49,9 +55,17 @@ task main()
 	float driveGainSlow = 0.5;
 	float driveGainFast = 1.;
 	float driveGain = driveGainFast;
+
+	//---Buttons---
+	int dispenseButton = 2;
 	int gainButton = 32;
 #endif
 
+// ----INIT Actions ----
+motor[dispense]=0;
+nMotorEncoderTarget[dispense]=initDispenseRotate;
+motor[dispense]=dispenseSpeed;
+while (nMotorRunState[dispense]==runStateIdle) {}
 
 	while (true){
 		encoderAverage=(nMotorEncoder[liftA]+nMotorEncoder[liftB])/2; // arm encoder average between both motors
@@ -122,6 +136,19 @@ task main()
 			armMovement = 0;
 		}
 #endif
+
+		//Universal Button Actions
+		//Driver Buttons
+
+		//Gunner Buttons
+		if (joyButtons2==dispenseButton && nMotorRunState[dispense]!=runStateRunning){
+			motor[dispense]=0;
+			nMotorEncoderTarget[dispense]=dispenseRotate;
+			motor[dispense]=dispenseSpeed;
+		}
+
+
+
 
 		//DRIVER//
 		motor[leftF]=driveSpeedLeft;
