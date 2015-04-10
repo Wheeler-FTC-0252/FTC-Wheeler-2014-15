@@ -12,7 +12,7 @@
 #include "Transfer2.0.c"
 #include "JoystickDriver.c"
 
-#define debug 1
+#define debug 0
 
 #if 1==0
 #define properJoysticks 1 // actual joysticks -  Logitech Attack 3
