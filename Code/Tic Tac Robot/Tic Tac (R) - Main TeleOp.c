@@ -14,6 +14,7 @@
 #include "Transfer2.0.c"
 #include "JoystickDriver.c"
 
+//Timers used: T1 (stopping multi-dispsense)
 #define debug 0
 
 #if 1==0
@@ -24,6 +25,7 @@
 
 task main()
 {
+	clearTimer(T1);
 	nMotorEncoder[lift]=0;
 
 	float joy_1y1;
@@ -42,7 +44,8 @@ task main()
 	int driveSpeedRight;
 	int initDispenseRotate=185;
 	int dispenseRotate=60;
-	int dispenseSpeed=10;
+	int dispenseSpeed=15;
+	int dispenseWait = 500; //ms
 
 //Controller Type Param Setup
 #ifdef properJoysticks
@@ -52,14 +55,14 @@ task main()
 	int liftDownButton = 1;
 #elif defined(logitechDualShocks)
 	float armGainSlow = 0.25;
-	float armGainFast = 2.;
+	float armGainFast = 0.5;
 	float armGain = armGainFast;
 	float driveGainSlow = 0.5;
-	float driveGainFast = 1.;
+	float driveGainFast = 2;
 	float driveGain = driveGainFast;
 
 	//---Buttons---
-	int dispenseButton = 1;
+	int dispenseButton = 2;
 	int gainButton = 32;
 #endif
 
@@ -152,7 +155,8 @@ while (nMotorRunState[dispense]==runStateIdle) {}
 		//Driver Buttons
 
 		//Gunner Buttons
-		if (joyButtons2==dispenseButton && nMotorRunState[dispense]!=runStateRunning){
+		if (joyButtons2==dispenseButton && nMotorRunState[dispense]!=runStateRunning && time1[T1]>dispenseWait){
+			clearTimer(T1);
 			motor[dispense]=0;
 			nMotorEncoderTarget[dispense]=dispenseRotate;
 			motor[dispense]=dispenseSpeed;
@@ -168,7 +172,7 @@ while (nMotorRunState[dispense]==runStateIdle) {}
 
 		//Gunner//
 		if (
-			(encoderValue<liftLevels[0] && armMovement == 1)// below lowest and going down
+			(encoderValue<=liftLevels[0] && armMovement == 1)// below lowest and going down
 		|| (encoderValue>liftLevels[sizeof(liftLevels)/sizeof(int)-1] && armMovement == 2) //above highest and going up
 		|| armMovement == 0)//not moving
 		{
