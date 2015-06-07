@@ -34,7 +34,7 @@ task main()
 	float joy_1x2;
 	float joy_2x2;
 	int dband=15;
-	int liftLevels[2]={0, 12000};
+	int liftLevels[2]={10, 13200};
 	int encoderValue;
 	int armMovement=0;//0 = stopped, 1 = down, 2 = up
 	int joyButtons1;
