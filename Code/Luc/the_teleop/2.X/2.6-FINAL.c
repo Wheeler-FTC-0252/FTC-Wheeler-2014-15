@@ -21,7 +21,6 @@
 #define maxspeed 50 //used for arm motors
 #define sec_arm_speed 4 //linked to arm servo speed
 int arm_levels[NLEVELS]={0,150,590};
-int servo_levels[NLEVELS]={0,150,590};
 
 #include "JoystickDriver.c"
 
