@@ -25,7 +25,7 @@ int arm_levels[NLEVELS]={0,150,590};
 #include "JoystickDriver.c"
 
 int transfer_J_To_M(int joy,float slope,int dead) // joy = joy input, dead = dead band, slope = max motor output/max joy input - in this case 100/128
-{
+{ //transfers joystick to motor speed with specific settings
 	int y;
 	if (abs(joy)<dead)
 		y=0;
@@ -55,29 +55,29 @@ void movement(int tophat, int * roundup, int * rounddown){
 		*rounddown=NLEVELS-2;
 	}
 	else{//somewhere inbetween 2nd low and 2nd high
-		for (int ii=0; ii<NLEVELS-1; ii++)
+		for (int ii=0; ii<NLEVELS-1; ii++)//cycling through all indexes of arm_levels 
 		{
 			*roundup=ii+1;
 			*rounddown=ii;
 			if (arm_levels[*rounddown]<nMotorEncoder[arm] && nMotorEncoder[arm]<arm_levels[*rounddown])
-			{
-				break;
+			{ //looking for the arm_levels[roundup] larger and arm_levels[rounddown] smaller than the current level
+				break; // exits with the roundup/down set to the correct value
 			}
 		}
 	}
 	writeDebugStreamLine("En: %d, Roundup: %d, Rounddown: %d",nMotorEncoder[arm],*roundup,*rounddown);
 	switch (tophat){
-	case 0://up
-		motor[arm]=maxspeed;
+	case 0: // tophat is up
+		motor[arm]=maxspeed; //set motor speed
 		while (nMotorEncoder[arm]<arm_levels[*roundup]){
-		}
+		} // Note to self: hangs the code?
 		motor[arm]=0;
 
 		break;
-	case 4://down
+	case 4: // tophat is down
 		motor[arm]=-1*maxspeed;
 		while (nMotorEncoder[arm]>arm_levels[*rounddown]){
-		}
+		} // Note to self: hangs the code?
 		motor[arm]=0;
 		break;
 	}
@@ -109,6 +109,7 @@ task main()
 	while (true)
 	{
 		//wait10Msec(100);
+		//setting joystick variables!
 		getJoystickSettings(joystick);
 		joy_1y1=transfer_J_To_M(-joystick.joy1_y1, joyslope, dband);
 		joy_1y2=transfer_J_To_M(-joystick.joy1_y2, joyslope, dband);
@@ -116,15 +117,15 @@ task main()
 		joy_1x2=transfer_J_To_M(joystick.joy1_x2, joyslope, dband);
 		tophat=joystick.joy1_TopHat;
 		joy_2y1=transfer_J_To_M(-joystick.joy2_y1, joyslope, dband);
-    joy_2y2=transfer_J_To_M(-joystick.joy2_y2, joyslope, dband);
-    joy_2x1=transfer_J_To_M(joystick.joy2_x1, joyslope, dband);
-    joy_2x2=transfer_J_To_M(joystick.joy2_x2, joyslope, dband);
+		joy_2y2=transfer_J_To_M(-joystick.joy2_y2, joyslope, dband);
+		joy_2x1=transfer_J_To_M(joystick.joy2_x1, joyslope, dband);
+		joy_2x2=transfer_J_To_M(joystick.joy2_x2, joyslope, dband);
 
-		//   writeDebugStreamLine("one: %d, two: %d", nMotorEncoder[one], nMotorEncoder[two]);
+		//writeDebugStreamLine("one: %d, two: %d", nMotorEncoder[one], nMotorEncoder[two]);
 		//writeDebugStreamLine("two: %d", nMotorEncoder[two]);
 
-		if (joy_1y2!=0)//testing for joy being used
-		{
+		if (joy_1y2!=0)
+		{ // runs if joy is being used
 			if (
 				(nMotorEncoder[arm] < arm_levels[NLEVELS-1] && joy_1y2 > 0)
 			||
@@ -137,21 +138,21 @@ task main()
 				motor[arm]=0;
 			}
 		}
-		else if (tophat!=tophat_old){
-			writeDebugStreamLine("that has changed");
+		else if (tophat!=tophat_old){ //tophat has changed
+			writeDebugStreamLine("tophat has changed");
 			movement(tophat, &roundup, &rounddown);
 		}
 		tophat_old=tophat;
 
 		//grab goals
 		if (joy2Btn(00)==1){
-			if (!grabber_down){//is up (!equals to false)
-				servo[grabber]=80;//EDIT PLZ
-				grabber_down=true;
+			if (!grabber_down){ // grabber is up
+				servo[grabber]=80; // Change to correct value
+				grabber_down=true; // this is set so the other block of code is run next button press
 			}
-			else{
+			else{ // grabber is down
 				servo[grabber]=0;
-				grabber_down=false;
+				grabber_down=false; // this is set so the other block of code is run next button press
 			}
 		}
 	}
