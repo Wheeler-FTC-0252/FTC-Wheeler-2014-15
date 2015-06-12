@@ -65,7 +65,7 @@ void movement(int tophat, int * roundup, int * rounddown){
 			}
 		}
 	}
-	writeDebugStreamLine("En: %d, Roundup: %d, Rounddown: %d",nMotorEncoder[arm],*roundup,*rounddown);//nMotorEncoderTarget[arm]);
+	writeDebugStreamLine("En: %d, Roundup: %d, Rounddown: %d",nMotorEncoder[arm],*roundup,*rounddown);
 	switch (tophat){
 	case 0://up
 		motor[arm]=maxspeed;
