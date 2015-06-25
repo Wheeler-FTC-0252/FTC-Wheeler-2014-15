@@ -4,5 +4,4 @@ Wheeler School FTC
 
 ## Competition Code:
 --------------------
-
 `code/2014 - 15 Competition Robot/`
