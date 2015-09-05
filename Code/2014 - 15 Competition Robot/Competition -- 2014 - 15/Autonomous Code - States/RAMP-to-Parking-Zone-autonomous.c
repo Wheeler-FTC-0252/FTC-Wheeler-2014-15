@@ -64,9 +64,9 @@ task main()
 	tMUXSensor fSonar=msensor_S4_4;
 	tMUXSensor bSonar=msensor_S4_3;
 
-	USreadDist(fSonar);//dummy to stop random 0 from passing
-	USreadDist(bSonar);//dummy to stop random 0 from passing
-	USreadDist(lSonar);//dummy to stop random 0 from passing
+	USreadDist(fSonar);//first read to stop random 0 from passing
+	USreadDist(bSonar);
+	USreadDist(lSonar);
 
 	tMotor motorName;
 	for (int ii=0; ii<2; ii++){//resetting encoders
